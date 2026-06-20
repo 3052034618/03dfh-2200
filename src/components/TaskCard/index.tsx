@@ -4,10 +4,11 @@ import Taro from '@tarojs/taro';
 import classnames from 'classnames';
 import dayjs from 'dayjs';
 import styles from './index.module.scss';
-import { Task } from '@/types';
+import { Task, InspectionRecord } from '@/types';
 import StatusBadge from '@/components/StatusBadge';
 import TempZoneTag from '@/components/TempZoneTag';
 import { useInspection } from '@/store/inspection.context';
+import { storage } from '@/utils/storage';
 
 interface TaskCardProps {
   task: Task;
@@ -16,7 +17,7 @@ interface TaskCardProps {
 }
 
 const TaskCard: React.FC<TaskCardProps> = ({ task, onStart, onRelief }) => {
-  const { startInspection } = useInspection();
+  const { startInspection, loadRecord } = useInspection();
 
   const countdownText = useMemo(() => {
     const now = dayjs();
@@ -36,7 +37,20 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onStart, onRelief }) => {
     return diffMinutes < 30 && diffMinutes >= 0;
   }, [task.departureTimestamp]);
 
+  const findRecordByTaskId = (taskId: string): InspectionRecord | null => {
+    const records = storage.getInspectionRecords();
+    return records.find(r => r.taskId === taskId && r.completedAt) || null;
+  };
+
   const handleStart = () => {
+    if (task.status === 'completed') {
+      const record = findRecordByTaskId(task.id);
+      if (record) {
+        loadRecord(record);
+        Taro.navigateTo({ url: `/pages/inspection-result/index?recordId=${record.id}` });
+        return;
+      }
+    }
     startInspection(task);
     Taro.navigateTo({ url: '/pages/inspection-detail/index?itemKey=precooling' });
     onStart?.();

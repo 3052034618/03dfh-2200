@@ -257,6 +257,7 @@ interface InspectionContextType {
   canSubmit: () => boolean;
   isTempBlocked: () => boolean;
   getProgress: () => number;
+  loadRecord: (record: InspectionRecord) => void;
 }
 
 const InspectionContext = createContext<InspectionContextType | undefined>(undefined);
@@ -328,6 +329,11 @@ export const InspectionProvider: React.FC<{ children: ReactNode }> = ({ children
     return (checkedCount / INSPECTION_ITEM_KEYS.length) * 100;
   };
 
+  const loadRecord = (record: InspectionRecord) => {
+    dispatch({ type: 'LOAD_RECORD', payload: record });
+    console.log('[InspectionContext] Record loaded:', record.id);
+  };
+
   return (
     <InspectionContext.Provider
       value={{
@@ -343,7 +349,8 @@ export const InspectionProvider: React.FC<{ children: ReactNode }> = ({ children
         resetInspection,
         canSubmit,
         isTempBlocked,
-        getProgress
+        getProgress,
+        loadRecord
       }}
     >
       {children}

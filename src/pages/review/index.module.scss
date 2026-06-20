@@ -1330,3 +1330,152 @@
   font-size: $font-size-xs;
   color: $color-text-secondary;
 }
+
+.groupHeaderExpanded {
+  padding-bottom: $spacing-md;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.groupExpandIcon {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-left: $spacing-xs;
+}
+
+.reviewCarList {
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 2rpx dashed $color-divider;
+}
+
+.reviewCarListTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+}
+
+.reviewCarItem {
+  background: $color-bg-hover;
+  border-radius: $radius-md;
+  margin-bottom: $spacing-sm;
+  overflow: hidden;
+}
+
+.reviewCarHeader {
+  display: flex;
+  align-items: center;
+  padding: $spacing-sm $spacing-md;
+  gap: $spacing-sm;
+}
+
+.reviewCarPlate {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.reviewCarPlateText {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.reviewCarDecision {
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+}
+
+.decisionRelease {
+  background: rgba(0, 200, 83, 0.15);
+  color: $color-success;
+}
+
+.decisionBlock {
+  background: rgba(213, 0, 0, 0.15);
+  color: $color-error;
+}
+
+.reviewCarDriver {
+  flex: 1;
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.reviewCarTime {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.reviewCarExpand {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.reviewCarBody {
+  padding: $spacing-md;
+  background: $color-bg-card;
+  border-top: 1rpx solid $color-divider;
+}
+
+.reviewCarSection {
+  margin-bottom: $spacing-md;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.reviewCarSectionTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+}
+
+.reviewCarStats {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.reviewCarStat {
+  flex: 1;
+  background: $color-bg-hover;
+  border-radius: $radius-sm;
+  padding: $spacing-sm;
+  text-align: center;
+}
+
+.reviewCarStatVal {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  line-height: 1.2;
+}
+
+.reviewCarStatLabel {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  margin-top: 4rpx;
+}
+
+.viewResultBtn {
+  @include button-reset;
+  width: 100%;
+  height: $button-height-md;
+  border-radius: $radius-button;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  margin-top: $spacing-md;
+
+  &:active {
+    opacity: 0.9;
+  }
+}

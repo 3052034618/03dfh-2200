@@ -68,6 +68,8 @@ const ReviewPage: React.FC = () => {
   const [savingNote, setSavingNote] = useState<string | null>(null);
   const [selectedDecision, setSelectedDecision] = useState<Record<string, ReviewDecision>>({});
   const [contactNote, setContactNote] = useState<Record<string, string>>({});
+  const [expandedTempZone, setExpandedTempZone] = useState<TempZoneType | null>(null);
+  const [expandedReviewCar, setExpandedReviewCar] = useState<string | null>(null);
 
   const loadData = useCallback(() => {
     console.log('[ReviewPage] Loading driver statuses...');
@@ -179,11 +181,16 @@ const ReviewPage: React.FC = () => {
       const diffMinutes = Math.floor((s.departureTimestamp - now) / 60000);
       const isNearDeparture = diffMinutes < 30 && s.status !== 'completed';
       const hasProblems = s.skippedItems.length > 0 || (s.failedItems?.length || 0) > 0;
-      return isNearDeparture || (hasProblems && s.status !== 'completed');
+      return isNearDeparture || hasProblems;
     });
     
     if (reviewStatusFilter === 'all') return baseList;
-    return baseList.filter(s => s.reviewStatus === reviewStatusFilter);
+    return baseList.filter(s => {
+      if (reviewStatusFilter === 'pending_contact') {
+        return !s.reviewStatus || s.reviewStatus === 'pending_contact';
+      }
+      return s.reviewStatus === reviewStatusFilter;
+    });
   }, [sortedStatuses, reviewStatusFilter]);
 
   const summaryData = useMemo(() => {
@@ -469,7 +476,18 @@ const ReviewPage: React.FC = () => {
 
   const generateExportText = (): string => {
     const dateStr = dayjs().format('YYYY年M月D日');
-    const lines: string[] = [`【冷链班前温控检查 ${dateStr} 收班汇总】`, ''];
+    const nowTime = dayjs().format('HH:mm');
+    const lines: string[] = [
+      `【冷链班前温控检查 ${dateStr} 收班交班记录】`,
+      '',
+      `统计时间：${nowTime}`,
+      `记录人：班组长`,
+      ''
+    ];
+
+    const allUnclosed: DriverInspectionStatus[] = [];
+    const allReleased: DriverInspectionStatus[] = [];
+    const allBlocked: DriverInspectionStatus[] = [];
 
     (['frozen', 'refrigerated', 'constant'] as TempZoneType[]).forEach(type => {
       const config = getTempZoneConfig(type);
@@ -487,24 +505,73 @@ const ReviewPage: React.FC = () => {
         lines.push(`已放行：${data.released} | 已拦截：${data.blocked} | 未闭环：${data.unclosed}`);
       }
 
+      const unclosedList = data.items.filter(s => 
+        (s.skippedItems.length > 0 || (s.failedItems?.length || 0) > 0) && !s.reviewClosedAt
+      );
+      if (unclosedList.length > 0) {
+        lines.push(`未闭环车辆：`);
+        unclosedList.forEach(s => {
+          const reasons: string[] = [];
+          if (s.skippedItems.length > 0) reasons.push(`跳过${s.skippedItems.length}项`);
+          if ((s.failedItems?.length || 0) > 0) reasons.push(`异常${s.failedItems.length}项`);
+          const status = s.reviewStatus ? `[${reviewStatusLabel[s.reviewStatus]}]` : '[待联系]';
+          const relief = s.isRelief && s.inspectorName ? `(代检:${s.inspectorName})` : '';
+          const handler = s.reviewedBy ? `·处理人:${s.reviewedBy}` : '';
+          lines.push(`  ${s.plateNumber} ${s.driverName}${relief} ${status} ${reasons.join(' ')}${handler}`);
+          allUnclosed.push(s);
+        });
+      }
+
+      const releasedList = data.items.filter(s => s.reviewDecision === 'release');
+      if (releasedList.length > 0) {
+        lines.push(`已放行车辆：`);
+        releasedList.forEach(s => {
+          const relief = s.isRelief && s.inspectorName ? `(代检:${s.inspectorName})` : '';
+          const handler = s.reviewedBy ? `·处理人:${s.reviewedBy}` : '';
+          const closeTime = s.reviewClosedAt ? `·${dayjs(s.reviewClosedAt).format('HH:mm')}` : '';
+          lines.push(`  ✅ ${s.plateNumber} ${s.driverName}${relief}${handler}${closeTime}`);
+          allReleased.push(s);
+        });
+      }
+
+      const blockedList = data.items.filter(s => s.reviewDecision === 'block');
+      if (blockedList.length > 0) {
+        lines.push(`已拦截车辆：`);
+        blockedList.forEach(s => {
+          const relief = s.isRelief && s.inspectorName ? `(代检:${s.inspectorName})` : '';
+          const handler = s.reviewedBy ? `·处理人:${s.reviewedBy}` : '';
+          const closeTime = s.reviewClosedAt ? `·${dayjs(s.reviewClosedAt).format('HH:mm')}` : '';
+          lines.push(`  🚫 ${s.plateNumber} ${s.driverName}${relief}${handler}${closeTime}`);
+          allBlocked.push(s);
+        });
+      }
+
       const pendingList = data.items.filter(s => s.status !== 'completed');
       if (pendingList.length > 0) {
-        lines.push(`未完成车辆：`);
+        lines.push(`未完成检查：`);
         pendingList.forEach(s => {
           const flag = (s.failedItems?.length || 0) > 0 ? '[异常]' : s.skippedItems.length > 0 ? '[跳过]' : '';
           const relief = s.isRelief && s.inspectorName ? `(代检:${s.inspectorName})` : '';
-          lines.push(`  ${s.plateNumber} ${s.driverName}${relief} ${flag}`);
+          const statusText = s.status === 'in_progress' ? '[检查中]' : '[待检查]';
+          lines.push(`  ⏳ ${s.plateNumber} ${s.driverName}${relief} ${statusText} ${flag}`);
         });
       }
       lines.push('');
     });
 
-    lines.push(`━━━ 总计 ━━━`);
+    lines.push(`━━━ 整体汇总 ━━━`);
     lines.push(`总车辆：${stats.total}台 | 已完成：${stats.completed} | 检查中：${stats.inProgress} | 待检查：${stats.pending}`);
-    lines.push(`异常车辆：${stats.hasFailed} | 有跳过：${stats.hasSkipped} | 未闭环：${stats.unclosed}`);
-    lines.push(`已放行：${stats.released} | 已拦截：${stats.blocked}`);
+    lines.push(`异常车辆：${stats.hasFailed} | 有跳过：${stats.hasSkipped}`);
+    lines.push(`已放行：${stats.released} | 已拦截：${stats.blocked} | 未闭环：${stats.unclosed}`);
     lines.push('');
-    lines.push(`——班组长 ${dayjs().format('HH:mm')} 统计`);
+
+    if (allUnclosed.length > 0) {
+      lines.push(`⚠️ 待办提醒：还有 ${allUnclosed.length} 台车未完成处置闭环，请班组长跟进。`);
+      lines.push('');
+    }
+
+    lines.push(`——班组长 ${nowTime} 交班`);
+    lines.push(`（最后更新：${nowTime}）`);
 
     return lines.join('\n');
   };
@@ -768,6 +835,133 @@ const ReviewPage: React.FC = () => {
     );
   };
 
+  const handleViewResult = (status: DriverInspectionStatus) => {
+    if (!status.recordId) return;
+    Taro.navigateTo({ 
+      url: `/pages/inspection-result/index?recordId=${status.recordId}` 
+    });
+  };
+
+  const renderReviewCarDetail = (s: DriverInspectionStatus) => {
+    const record = getInspectionRecord(s);
+    return (
+      <View key={s.plateNumber} className={styles.reviewCarItem}>
+        <View 
+          className={styles.reviewCarHeader}
+          onClick={() => setExpandedReviewCar(expandedReviewCar === s.plateNumber ? null : s.plateNumber)}
+        >
+          <View className={styles.reviewCarPlate}>
+            <Text className={styles.reviewCarPlateText}>{s.plateNumber}</Text>
+            {s.reviewDecision && (
+              <View className={classnames(
+                styles.reviewCarDecision,
+                s.reviewDecision === 'release' ? styles.decisionRelease : styles.decisionBlock
+              )}>
+                <Text>{s.reviewDecision === 'release' ? '放行' : '拦截'}</Text>
+              </View>
+            )}
+          </View>
+          <View className={styles.reviewCarDriver}>
+            <Text>
+              {s.isRelief && s.inspectorName 
+                ? `${s.originalDriverName || s.driverName} → ${s.inspectorName} 代检` 
+                : s.driverName}
+            </Text>
+            <Text className={styles.reviewCarTime}>{s.departureTime} 发车</Text>
+          </View>
+          <Text className={styles.reviewCarExpand}>
+            {expandedReviewCar === s.plateNumber ? '收起' : '详情'} ›
+          </Text>
+        </View>
+
+        {expandedReviewCar === s.plateNumber && (
+          <View className={styles.reviewCarBody}>
+            <View className={styles.reviewCarSection}>
+              <Text className={styles.reviewCarSectionTitle}>📋 检查结果</Text>
+              <View className={styles.reviewCarStats}>
+                <View className={styles.reviewCarStat}>
+                  <Text className={styles.reviewCarStatVal} style={{color: '#00C853'}}>
+                    {s.completedItems - s.skippedItems.length - (s.failedItems?.length || 0)}
+                  </Text>
+                  <Text className={styles.reviewCarStatLabel}>通过</Text>
+                </View>
+                <View className={styles.reviewCarStat}>
+                  <Text className={styles.reviewCarStatVal} style={{color: '#FF6D00'}}>
+                    {s.skippedItems.length}
+                  </Text>
+                  <Text className={styles.reviewCarStatLabel}>跳过</Text>
+                </View>
+                <View className={styles.reviewCarStat}>
+                  <Text className={styles.reviewCarStatVal} style={{color: '#D50000'}}>
+                    {s.failedItems?.length || 0}
+                  </Text>
+                  <Text className={styles.reviewCarStatLabel}>异常</Text>
+                </View>
+              </View>
+            </View>
+
+            {s.reviewNote && (
+              <View className={styles.reviewCarSection}>
+                <Text className={styles.reviewCarSectionTitle}>💬 复核结论</Text>
+                <View className={styles.reviewNoteSaved}>
+                  <Text>✓ {s.reviewNote}</Text>
+                </View>
+                {s.reviewedBy && s.reviewedAt && (
+                  <Text className={styles.reviewNoteMeta}>
+                    由 {s.reviewedBy} 于 {formatTime(s.reviewedAt)} 记录
+                  </Text>
+                )}
+              </View>
+            )}
+
+            {s.contactLog && s.contactLog.length > 0 && (
+              <View className={styles.reviewCarSection}>
+                <Text className={styles.reviewCarSectionTitle}>📞 联系记录</Text>
+                {s.contactLog.map((log, idx) => (
+                  <View key={idx} className={styles.contactLogItem}>
+                    <View className={styles.contactLogHeader}>
+                      <Text className={classnames(styles.contactLogType, log.type === 'driver' ? styles.driver : styles.warehouse)}>
+                        {log.type === 'driver' ? '联系司机' : '联系仓库'}
+                      </Text>
+                      <Text className={styles.contactLogTime}>{formatDateTime(log.contactedAt)}</Text>
+                    </View>
+                    {log.note && <Text className={styles.contactLogNote}>{log.note}</Text>}
+                    <Text className={styles.contactLogBy}>记录人：{log.contactedBy}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {s.reviewDecision && (
+              <View className={styles.reviewCarSection}>
+                <Text className={styles.reviewCarSectionTitle}>🎯 最终结论</Text>
+                <View className={classnames(styles.decisionSaved, s.reviewDecision === 'release' ? styles.released : styles.blocked)}>
+                  <Text className={classnames(styles.decisionSavedText, s.reviewDecision === 'release' ? styles.released : styles.blocked)}>
+                    {s.reviewDecision === 'release' ? '✅ 已允许发车' : '🚫 已拦截，需整改'}
+                  </Text>
+                  {s.reviewClosedAt && (
+                    <Text className={styles.contactLogTime} style={{ marginLeft: 'auto' }}>
+                      {formatDateTime(s.reviewClosedAt)}
+                    </Text>
+                  )}
+                </View>
+              </View>
+            )}
+
+            {record && (
+              <Button 
+                className={styles.viewResultBtn}
+                onClick={() => handleViewResult(s)}
+              >
+                查看完整检查报告
+              </Button>
+            )}
+          </View>
+        )}
+      </View>
+    );
+  };
+
   const renderSummaryGroup = (type: TempZoneType) => {
     const config = getTempZoneConfig(type);
     const data = summaryData[type];
@@ -778,13 +972,18 @@ const ReviewPage: React.FC = () => {
     const unclosedItems = data.items.filter(s => 
       (s.skippedItems.length > 0 || (s.failedItems?.length || 0) > 0) && !s.reviewClosedAt
     );
+    const isExpanded = expandedTempZone === type;
 
     return (
       <View key={type} className={styles.summaryGroup}>
-        <View className={styles.summaryGroupHeader}>
+        <View 
+          className={classnames(styles.summaryGroupHeader, isExpanded && styles.groupHeaderExpanded)}
+          onClick={() => setExpandedTempZone(isExpanded ? null : type)}
+        >
           <View className={styles.summaryGroupTitle}>
             <TempZoneTag type={type} showTemp size="sm" />
             <Text>{config.label}车</Text>
+            <Text className={styles.groupExpandIcon}>{isExpanded ? '▲' : '▼'}</Text>
           </View>
           <Text className={classnames(styles.summaryGroupRate, getCompletionRateClass(data.completed, data.total))}>
             完成率 {rate}%
@@ -883,6 +1082,13 @@ const ReviewPage: React.FC = () => {
                 </View>
               ))}
             </View>
+          </View>
+        )}
+
+        {isExpanded && (
+          <View className={styles.reviewCarList}>
+            <Text className={styles.reviewCarListTitle}>📋 收班复盘明细 ({data.items.length})</Text>
+            {data.items.map(s => renderReviewCarDetail(s))}
           </View>
         )}
       </View>

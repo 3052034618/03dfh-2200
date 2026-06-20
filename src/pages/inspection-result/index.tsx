@@ -1,11 +1,11 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useState, useEffect } from 'react';
 import { View, Text, Button, ScrollView } from '@tarojs/components';
-import { useDidShow } from '@tarojs/taro';
+import { useDidShow, useRouter } from '@tarojs/taro';
 import Taro from '@tarojs/taro';
 import classnames from 'classnames';
 import dayjs from 'dayjs';
 import styles from './index.module.scss';
-import { CheckStatus, InspectionItemKey, DriverInspectionStatus } from '@/types';
+import { CheckStatus, InspectionItemKey, DriverInspectionStatus, InspectionRecord, Task } from '@/types';
 import { INSPECTION_ITEMS, INSPECTION_ITEM_KEYS, getTempZoneConfig } from '@/data/inspection';
 import { useInspection } from '@/store/inspection.context';
 import { storage } from '@/utils/storage';
@@ -13,23 +13,61 @@ import TempZoneTag from '@/components/TempZoneTag';
 
 const InspectionResultPage: React.FC = () => {
   const { state, resetInspection } = useInspection();
+  const router = useRouter();
+  const [loadedRecord, setLoadedRecord] = useState<InspectionRecord | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const recordId = router.params?.recordId;
+
+  const currentRecord = useMemo(() => {
+    if (recordId) {
+      const records = storage.getInspectionRecords();
+      return records.find(r => r.id === recordId) || null;
+    }
+    return currentRecord;
+  }, [recordId, currentRecord, refreshKey]);
+
+  const currentTask = useMemo(() => {
+    if (currentRecord && recordId) {
+      return {
+        id: currentRecord.taskId,
+        plateNumber: currentRecord.plateNumber,
+        driverName: currentRecord.driverName,
+        departureTime: currentRecord.departureTime,
+        departureTimestamp: currentRecord.createdAt,
+        destination: '',
+        status: 'completed',
+        tempZone: currentRecord.tempZone,
+        waybillNo: currentRecord.waybillNo
+      } as Task;
+    }
+    return state.currentTask;
+  }, [currentRecord, recordId, state.currentTask]);
 
   const loadReviewStatus = useCallback((): DriverInspectionStatus | null => {
-    if (!state.currentRecord?.plateNumber) return null;
+    if (!currentRecord?.plateNumber) return null;
     const statuses = storage.getDriverStatuses();
-    return statuses.find(s => s.plateNumber === state.currentRecord?.plateNumber) || null;
-  }, [state.currentRecord]);
+    return statuses.find(s => s.plateNumber === currentRecord?.plateNumber) || null;
+  }, [currentRecord]);
 
-  const reviewStatus = useMemo(() => loadReviewStatus(), [loadReviewStatus, state.currentRecord]);
+  const reviewStatus = useMemo(() => loadReviewStatus(), [loadReviewStatus]);
 
   useDidShow(() => {
-    // 页面显示时刷新复核状态
+    setRefreshKey(prev => prev + 1);
   });
 
+  useEffect(() => {
+    if (recordId) {
+      const records = storage.getInspectionRecords();
+      const rec = records.find(r => r.id === recordId) || null;
+      setLoadedRecord(rec);
+    }
+  }, [recordId, refreshKey]);
+
   const summary = useMemo(() => {
-    if (!state.currentRecord) return null;
+    if (!currentRecord) return null;
     
-    const items = state.currentRecord.items;
+    const items = currentRecord.items;
     let passed = 0, skipped = 0, failed = 0;
     
     Object.values(items).forEach(item => {
@@ -39,11 +77,11 @@ const InspectionResultPage: React.FC = () => {
     });
 
     return { passed, skipped, failed, total: passed + skipped + failed };
-  }, [state.currentRecord]);
+  }, [currentRecord]);
 
   const hasSkipped = summary && summary.skipped > 0;
   const hasFailed = summary && summary.failed > 0;
-  const isRelief = state.isReliefInspection || state.currentRecord?.inspectorName;
+  const isRelief = state.isReliefInspection || currentRecord?.inspectorName;
 
   const getItemStatusClass = (status: CheckStatus): string => {
     switch (status) {
@@ -85,7 +123,7 @@ const InspectionResultPage: React.FC = () => {
     });
   };
 
-  if (!state.currentRecord || !state.currentTask) {
+  if (!currentRecord || !currentTask) {
     return (
       <View className={styles.page}>
         <View className={styles.content}>
@@ -104,10 +142,10 @@ const InspectionResultPage: React.FC = () => {
     );
   }
 
-  const tempZoneConfig = getTempZoneConfig(state.currentRecord.tempZone);
-  const isTempMatch = state.currentRecord.isTempMatch || 
-    (state.currentRecord.currentTemp !== 0 && 
-     state.currentRecord.items.precooling.status === 'passed') ||
+  const tempZoneConfig = getTempZoneConfig(currentRecord.tempZone);
+  const isTempMatch = currentRecord.isTempMatch || 
+    (currentRecord.currentTemp !== 0 && 
+     currentRecord.items.precooling.status === 'passed') ||
     state.matchingVerified;
 
   return (
@@ -125,21 +163,21 @@ const InspectionResultPage: React.FC = () => {
           <Text className={styles.cardTitle}>基本信息</Text>
           <View className={styles.infoRow}>
             <Text className={styles.infoLabel}>车牌号</Text>
-            <Text className={styles.infoValue}>{state.currentRecord.plateNumber}</Text>
+            <Text className={styles.infoValue}>{currentRecord.plateNumber}</Text>
           </View>
-          {isRelief && state.currentRecord.inspectorName && state.currentRecord.originalDriverName ? (
+          {isRelief && currentRecord.inspectorName && currentRecord.originalDriverName ? (
             <>
               <View className={styles.infoRow}>
                 <Text className={styles.infoLabel}>司机信息</Text>
                 <View className={styles.relDriverDisplay}>
                   <View className={styles.relDriverBox}>
                     <Text className={styles.relDriverLabel}>原司机</Text>
-                    <Text className={styles.relDriverName}>{state.currentRecord.originalDriverName}</Text>
+                    <Text className={styles.relDriverName}>{currentRecord.originalDriverName}</Text>
                   </View>
                   <Text className={styles.relDriverArrow}>→</Text>
                   <View className={classnames(styles.relDriverBox, styles.relDriverBoxActive)}>
                     <Text className={styles.relDriverLabel}>代检人</Text>
-                    <Text className={styles.relDriverName}>{state.currentRecord.inspectorName}</Text>
+                    <Text className={styles.relDriverName}>{currentRecord.inspectorName}</Text>
                   </View>
                 </View>
               </View>
@@ -148,58 +186,58 @@ const InspectionResultPage: React.FC = () => {
             <View className={styles.infoRow}>
               <Text className={styles.infoLabel}>司机</Text>
               <Text className={styles.infoValue}>
-                {state.currentRecord.driverName}
+                {currentRecord.driverName}
               </Text>
             </View>
           )}
           <View className={styles.infoRow}>
             <Text className={styles.infoLabel}>发车时间</Text>
-            <Text className={styles.infoValue}>{state.currentRecord.departureTime}</Text>
+            <Text className={styles.infoValue}>{currentRecord.departureTime}</Text>
           </View>
           <View className={styles.infoRow}>
             <Text className={styles.infoLabel}>运单号</Text>
-            <Text className={styles.infoValue}>{state.currentRecord.waybillNo}</Text>
+            <Text className={styles.infoValue}>{currentRecord.waybillNo}</Text>
           </View>
           <View className={styles.infoRow}>
             <Text className={styles.infoLabel}>温区要求</Text>
             <View style={{ flex: 1 }}>
-              <TempZoneTag type={state.currentRecord.tempZone} showTemp size="sm" />
+              <TempZoneTag type={currentRecord.tempZone} showTemp size="sm" />
             </View>
           </View>
           <View className={styles.infoRow}>
             <Text className={styles.infoLabel}>当前温度</Text>
-            <Text className={styles.infoValue}>{state.currentRecord.currentTemp}℃</Text>
+            <Text className={styles.infoValue}>{currentRecord.currentTemp}℃</Text>
           </View>
           <View className={styles.infoRow}>
             <Text className={styles.infoLabel}>检查时间</Text>
             <Text className={styles.infoValue}>
-              {dayjs(state.currentRecord.completedAt || Date.now()).format('YYYY-MM-DD HH:mm:ss')}
+              {dayjs(currentRecord.completedAt || Date.now()).format('YYYY-MM-DD HH:mm:ss')}
             </Text>
           </View>
 
-          {state.currentRecord.matchingVerified && (
+          {currentRecord.matchingVerified && (
             <View className={styles.matchingTraceCard}>
               <Text className={styles.matchingTraceTitle}>📦 温区匹配验证追溯</Text>
               <View className={styles.matchingTraceRow}>
                 <Text className={styles.matchingTraceLabel}>运单号</Text>
-                <Text className={styles.matchingTraceValue}>{state.currentRecord.matchingWaybillNo || state.currentRecord.waybillNo}</Text>
+                <Text className={styles.matchingTraceValue}>{currentRecord.matchingWaybillNo || currentRecord.waybillNo}</Text>
               </View>
-              {state.currentRecord.goodsName && (
+              {currentRecord.goodsName && (
                 <View className={styles.matchingTraceRow}>
                   <Text className={styles.matchingTraceLabel}>货品名称</Text>
-                  <Text className={styles.matchingTraceValue}>{state.currentRecord.goodsName}</Text>
+                  <Text className={styles.matchingTraceValue}>{currentRecord.goodsName}</Text>
                 </View>
               )}
-              {state.currentRecord.targetTemp && (
+              {currentRecord.targetTemp && (
                 <View className={styles.matchingTraceRow}>
                   <Text className={styles.matchingTraceLabel}>目标温度</Text>
-                  <Text className={styles.matchingTraceValue}>{state.currentRecord.targetTemp}</Text>
+                  <Text className={styles.matchingTraceValue}>{currentRecord.targetTemp}</Text>
                 </View>
               )}
-              {state.currentRecord.matchingTemp !== undefined && (
+              {currentRecord.matchingTemp !== undefined && (
                 <View className={styles.matchingTraceRow}>
                   <Text className={styles.matchingTraceLabel}>验证温度</Text>
-                  <Text className={styles.matchingTraceValue}>{state.currentRecord.matchingTemp}℃</Text>
+                  <Text className={styles.matchingTraceValue}>{currentRecord.matchingTemp}℃</Text>
                 </View>
               )}
               <View className={styles.matchingTraceRow}>
@@ -212,8 +250,8 @@ const InspectionResultPage: React.FC = () => {
           <View className={classnames(styles.tempMatchCard, !isTempMatch && styles.tempMismatchCard)}>
             <Text className={styles.tempMatchText}>
               {isTempMatch 
-                ? `✅ 温度匹配：${state.currentRecord.currentTemp}℃ 符合${tempZoneConfig.label}区要求`
-                : `⚠️ 温度不匹配：${state.currentRecord.currentTemp}℃ 不符合${tempZoneConfig.label}区要求（${tempZoneConfig.tempRange}）`}
+                ? `✅ 温度匹配：${currentRecord.currentTemp}℃ 符合${tempZoneConfig.label}区要求`
+                : `⚠️ 温度不匹配：${currentRecord.currentTemp}℃ 不符合${tempZoneConfig.label}区要求（${tempZoneConfig.tempRange}）`}
             </Text>
           </View>
         </View>
@@ -246,7 +284,7 @@ const InspectionResultPage: React.FC = () => {
           <Text className={styles.cardTitle}>检查明细</Text>
           {INSPECTION_ITEM_KEYS.map((key: InspectionItemKey, index: number) => {
             const item = INSPECTION_ITEMS.find(i => i.key === key)!;
-            const record = state.currentRecord!.items[key];
+            const record = currentRecord!.items[key];
             return (
               <View key={key} className={styles.itemRow}>
                 <View className={classnames(styles.itemIndex, getItemStatusClass(record.status))}>
@@ -273,8 +311,8 @@ const InspectionResultPage: React.FC = () => {
           <View className={styles.reliefCard}>
             <Text className={styles.reliefCardTitle}>🔄 临时替班说明</Text>
             <Text className={styles.reliefCardText}>
-              本次检查由 {state.currentRecord.inspectorName} 代
-              {state.currentRecord.originalDriverName || state.currentRecord.driverName} 执行，
+              本次检查由 {currentRecord.inspectorName} 代
+              {currentRecord.originalDriverName || currentRecord.driverName} 执行，
               所有检查结果已如实记录，班组长将进行重点核查。
             </Text>
           </View>
