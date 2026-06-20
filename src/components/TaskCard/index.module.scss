@@ -6,6 +6,13 @@
   padding: $spacing-lg;
   margin-bottom: $spacing-md;
   box-shadow: $shadow-card;
+  border: 2rpx solid transparent;
+  transition: all $transition-base;
+}
+
+.card.urgent {
+  border-color: $color-warning;
+  background: rgba(255, 109, 0, 0.03);
 }
 
 .header {
@@ -15,6 +22,24 @@
   margin-bottom: $spacing-md;
   padding-bottom: $spacing-md;
   border-bottom: 1rpx solid $color-divider;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.urgentBadge {
+  background: linear-gradient(135deg, $color-error 0%, #FF5252 100%);
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-xs;
+}
+
+.urgentText {
+  color: $color-text-white;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
 }
 
 .plateNumber {
@@ -30,13 +55,27 @@
   letter-spacing: 2rpx;
 }
 
+.reliefInfo {
+  background: rgba(255, 171, 0, 0.08);
+  border-left: 4rpx solid #FFAB00;
+  padding: $spacing-xs $spacing-sm;
+  margin-bottom: $spacing-md;
+  border-radius: 0 $radius-xs $radius-xs 0;
+}
+
+.reliefInfoText {
+  font-size: $font-size-xs;
+  color: #FFAB00;
+  font-weight: $font-weight-medium;
+}
+
 .body {
   margin-bottom: $spacing-md;
 }
 
 .infoRow {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: $spacing-sm;
 
   &:last-child {
@@ -59,9 +98,25 @@
 }
 
 .valueHighlight {
-  flex: 1;
   font-size: $font-size-md;
   color: $color-primary;
+  font-weight: $font-weight-semibold;
+}
+
+.timeInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.countdown {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.countdownUrgent {
+  color: $color-error;
   font-weight: $font-weight-semibold;
 }
 
@@ -71,6 +126,30 @@
   justify-content: space-between;
   padding-top: $spacing-md;
   border-top: 1rpx solid $color-divider;
+}
+
+.btnGroup {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.reliefBtn {
+  @include button-reset;
+  height: $button-height-md;
+  padding: 0 $spacing-md;
+  border-radius: $radius-button;
+  background: rgba(255, 171, 0, 0.1);
+  border: 2rpx solid #FFAB00;
+  color: #FFAB00;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
 }
 
 .startBtn {

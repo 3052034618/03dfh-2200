@@ -29,6 +29,7 @@ const InspectionResultPage: React.FC = () => {
 
   const hasSkipped = summary && summary.skipped > 0;
   const hasFailed = summary && summary.failed > 0;
+  const isRelief = state.isReliefInspection || state.currentRecord?.inspectorName;
 
   const getItemStatusClass = (status: CheckStatus): string => {
     switch (status) {
@@ -92,7 +93,8 @@ const InspectionResultPage: React.FC = () => {
   const tempZoneConfig = getTempZoneConfig(state.currentRecord.tempZone);
   const isTempMatch = state.currentRecord.isTempMatch || 
     (state.currentRecord.currentTemp !== 0 && 
-     state.currentRecord.items.precooling.status === 'passed');
+     state.currentRecord.items.precooling.status === 'passed') ||
+    state.matchingVerified;
 
   return (
     <View className={styles.page}>
@@ -112,12 +114,26 @@ const InspectionResultPage: React.FC = () => {
             <Text className={styles.infoValue}>{state.currentRecord.plateNumber}</Text>
           </View>
           <View className={styles.infoRow}>
-            <Text className={styles.infoLabel}>司机</Text>
-            <Text className={styles.infoValue}>{state.currentRecord.driverName}</Text>
+            <Text className={styles.infoLabel}>原司机</Text>
+            <Text className={styles.infoValue}>
+              {state.currentRecord.originalDriverName || state.currentRecord.driverName}
+            </Text>
+          </View>
+          {isRelief && state.currentRecord.inspectorName && (
+            <View className={styles.infoRow}>
+              <Text className={styles.infoLabel}>代检人</Text>
+              <View className={styles.reliefTag}>
+                <Text className={styles.reliefTagText}>🔄 {state.currentRecord.inspectorName}</Text>
+              </View>
+            </View>
+          )}
+          <View className={styles.infoRow}>
+            <Text className={styles.infoLabel}>发车时间</Text>
+            <Text className={styles.infoValue}>{state.currentRecord.departureTime}</Text>
           </View>
           <View className={styles.infoRow}>
             <Text className={styles.infoLabel}>运单号</Text>
-            <Text className={styles.infoValue}>{state.currentTask.waybillNo}</Text>
+            <Text className={styles.infoValue}>{state.currentRecord.waybillNo}</Text>
           </View>
           <View className={styles.infoRow}>
             <Text className={styles.infoLabel}>温区要求</Text>
@@ -136,7 +152,7 @@ const InspectionResultPage: React.FC = () => {
             </Text>
           </View>
 
-          <View className={styles.tempMatchCard}>
+          <View className={classnames(styles.tempMatchCard, !isTempMatch && styles.tempMismatchCard)}>
             <Text className={styles.tempMatchText}>
               {isTempMatch 
                 ? `✅ 温度匹配：${state.currentRecord.currentTemp}℃ 符合${tempZoneConfig.label}区要求`
@@ -179,9 +195,14 @@ const InspectionResultPage: React.FC = () => {
                 <View className={classnames(styles.itemIndex, getItemStatusClass(record.status))}>
                   {index + 1}
                 </View>
-                <Text className={styles.itemName}>{item.title}</Text>
+                <View className={styles.itemInfo}>
+                  <Text className={styles.itemName}>{item.title}</Text>
+                  {record.remark && (
+                    <Text className={styles.itemRemark}>备注：{record.remark}</Text>
+                  )}
+                </View>
                 {record.photo && (
-                  <View className={styles.photoIndicator} />
+                  <View className={styles.photoIndicator} title="已拍照留档">📷</View>
                 )}
                 <Text className={classnames(styles.statusText, getStatusTextClass(record.status))}>
                   {getStatusText(record.status)}
@@ -190,6 +211,17 @@ const InspectionResultPage: React.FC = () => {
             );
           })}
         </View>
+
+        {isRelief && (
+          <View className={styles.reliefCard}>
+            <Text className={styles.reliefCardTitle}>🔄 临时替班说明</Text>
+            <Text className={styles.reliefCardText}>
+              本次检查由 {state.currentRecord.inspectorName} 代
+              {state.currentRecord.originalDriverName || state.currentRecord.driverName} 执行，
+              所有检查结果已如实记录，班组长将进行重点核查。
+            </Text>
+          </View>
+        )}
 
         {hasSkipped && (
           <View className={styles.warningCard}>

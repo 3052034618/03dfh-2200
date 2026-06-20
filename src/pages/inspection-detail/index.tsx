@@ -11,18 +11,20 @@ import TempZoneTag from '@/components/TempZoneTag';
 
 const InspectionDetailPage: React.FC = () => {
   const router = useRouter();
-  const { state, updateItem, setTemperature, completeInspection, canSubmit, getProgress, resetInspection } = useInspection();
+  const { state, updateItem, setTemperature, completeInspection, canSubmit, isTempBlocked, getProgress, resetInspection } = useInspection();
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [tempInput, setTempInput] = useState('');
   const [photo, setPhoto] = useState<string | undefined>();
   const [remark, setRemark] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const itemKey = router.params.itemKey as InspectionItemKey || 'precooling';
   const currentItem = INSPECTION_ITEMS.find(i => i.key === itemKey) || INSPECTION_ITEMS[0];
   const isFirstItem = currentIndex === 0;
   const isLastItem = currentIndex === INSPECTION_ITEM_KEYS.length - 1;
   const progress = getProgress();
+  const tempBlocked = isTempBlocked();
 
   useEffect(() => {
     const index = INSPECTION_ITEM_KEYS.indexOf(itemKey);
@@ -33,11 +35,15 @@ const InspectionDetailPage: React.FC = () => {
       setPhoto(state.currentRecord.items[itemKey].photo);
       setRemark(state.currentRecord.items[itemKey].remark || '');
     }
-    if (itemKey === 'precooling' && state.currentTemp !== 0) {
-      setTempInput(state.currentTemp.toString());
+    if (itemKey === 'precooling') {
+      if (state.matchingVerified && state.matchingWaybillTemp !== 0) {
+        setTempInput(state.matchingWaybillTemp.toString());
+      } else if (state.currentTemp !== 0) {
+        setTempInput(state.currentTemp.toString());
+      }
     }
     console.log('[InspectionDetail] Current item:', itemKey, 'Index:', index);
-  }, [itemKey, state.currentRecord, state.currentTemp]);
+  }, [itemKey, state.currentRecord, state.currentTemp, state.matchingVerified, state.matchingWaybillTemp]);
 
   useEffect(() => {
     Taro.setNavigationBarTitle({
@@ -74,24 +80,36 @@ const InspectionDetailPage: React.FC = () => {
     }
   };
 
+  const handleContactWarehouse = () => {
+    Taro.makePhoneCall({
+      phoneNumber: '400-888-8888',
+      fail: (e) => {
+        console.error('[InspectionDetail] Call failed:', e);
+        Taro.showToast({ title: '拨号失败', icon: 'none' });
+      }
+    });
+  };
+
   const handleStatusSelect = (status: CheckStatus) => {
+    if (isSubmitting) return;
+
     if (itemKey === 'precooling') {
       if (!tempInput || isNaN(parseFloat(tempInput))) {
         Taro.showToast({ title: '请先输入当前温度', icon: 'none' });
         return;
       }
       const temp = parseFloat(tempInput);
-      if (status === 'passed' && state.currentTask) {
+      if (status === 'passed' && state.currentTask && !state.matchingVerified) {
         const isMatch = checkTempMatch(temp, state.currentTask.tempZone);
         if (!isMatch) {
           Taro.showModal({
             title: '温度不匹配',
-            content: `当前温度 ${temp}℃ 不符合${getTempZoneConfig(state.currentTask.tempZone).label}区要求，是否确认标记为异常？`,
-            confirmText: '标记异常',
-            cancelText: '重新检查',
+            content: `当前温度 ${temp}℃ 不符合${getTempZoneConfig(state.currentTask.tempZone).label}区要求，不能通过。请联系仓库复核。`,
+            confirmText: '联系仓库',
+            cancelText: '我知道了',
             success: (res) => {
               if (res.confirm) {
-                submitItem('failed');
+                handleContactWarehouse();
               }
             }
           });
@@ -112,34 +130,78 @@ const InspectionDetailPage: React.FC = () => {
     updateItem(itemKey, status, photo, remark);
     
     if (isLastItem) {
-      if (canSubmit()) {
-        Taro.showModal({
-          title: '检查完成',
-          content: '所有检查项已完成，是否提交检查报告？',
-          success: (res) => {
-            if (res.confirm) {
-              handleSubmit();
-            }
-          }
-        });
-      } else {
-        Taro.showToast({ title: '请完成所有检查项', icon: 'none' });
-      }
+      setTimeout(() => {
+        showSubmitConfirm();
+      }, 300);
     } else {
       navigateToNext();
     }
   };
 
+  const showSubmitConfirm = () => {
+    if (!canSubmit()) {
+      Taro.showToast({ title: '请完成所有检查项', icon: 'none' });
+      return;
+    }
+
+    const blocked = isTempBlocked();
+    if (blocked && !state.matchingVerified) {
+      Taro.showModal({
+        title: '温度不匹配，无法提交',
+        content: `当前温度 ${state.currentTemp}℃ 不符合温区要求，请联系仓库复核后重新检查。`,
+        confirmText: '联系仓库',
+        cancelText: '返回修改',
+        success: (res) => {
+          if (res.confirm) {
+            handleContactWarehouse();
+          }
+        }
+      });
+      return;
+    }
+
+    const hasSkipped = state.currentRecord ? 
+      INSPECTION_ITEM_KEYS.some(k => state.currentRecord!.items[k].status === 'skipped') : false;
+    const hasFailed = state.currentRecord ?
+      INSPECTION_ITEM_KEYS.some(k => state.currentRecord!.items[k].status === 'failed') : false;
+
+    let content = '所有检查项已处理完毕，是否提交检查报告？';
+    if (hasSkipped && hasFailed) {
+      content = '检查中有跳过和异常项，提交后班组长将进行重点抽查，确认提交？';
+    } else if (hasSkipped) {
+      content = '检查中有跳过项，提交后班组长将进行抽查，确认提交？';
+    } else if (hasFailed) {
+      content = '检查中有异常项，提交后需安排处理，确认提交？';
+    }
+
+    Taro.showModal({
+      title: '提交检查报告',
+      content: content,
+      confirmText: '确认提交',
+      cancelText: '再检查下',
+      success: (res) => {
+        if (res.confirm) {
+          handleSubmit();
+        }
+      }
+    });
+  };
+
   const handleSubmit = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     console.log('[InspectionDetail] Submitting inspection...');
     
+    Taro.showLoading({ title: '提交中...', mask: true });
+
     setTimeout(() => {
       completeInspection();
+      Taro.hideLoading();
       Taro.redirectTo({
         url: '/pages/inspection-result/index'
       });
       console.log('[InspectionDetail] Inspection submitted successfully');
-    }, 1000);
+    }, 800);
   };
 
   const navigateToPrev = () => {
@@ -202,6 +264,12 @@ const InspectionDetailPage: React.FC = () => {
           </View>
         </View>
 
+        {state.isReliefInspection && state.inspectorName && (
+          <View className={styles.reliefBadge}>
+            <Text className={styles.reliefText}>🔄 临时替班 - 代检：{state.inspectorName}</Text>
+          </View>
+        )}
+
         <View className={styles.itemHeader}>
           <View className={styles.itemIndex}>
             <Text className={styles.itemIndexText}>{currentIndex + 1}</Text>
@@ -235,6 +303,11 @@ const InspectionDetailPage: React.FC = () => {
                 📋 标准要求：{currentItem.standard}
               </Text>
             </View>
+            {state.fromMatching && state.matchingVerified && (
+              <View className={styles.matchVerifiedCard}>
+                <Text className={styles.matchVerifiedText}>✅ 温区已通过匹配验证（运单：{state.matchingWaybillNo}）</Text>
+              </View>
+            )}
           </View>
         )}
 
@@ -245,6 +318,13 @@ const InspectionDetailPage: React.FC = () => {
               <Text className={styles.tempValue}>{state.currentTemp}</Text>
               <Text className={styles.tempUnitDisplay}>℃</Text>
             </View>
+            {tempBlocked && !state.matchingVerified && (
+              <View className={styles.tempWarningCard}>
+                <Text className={styles.tempWarningText}>
+                  ⚠️ 当前温度不符合温区要求，请联系仓库复核
+                </Text>
+              </View>
+            )}
           </View>
         )}
 
@@ -319,20 +399,23 @@ const InspectionDetailPage: React.FC = () => {
           <Button
             className={classnames(styles.actionBtn, styles.skipBtn)}
             onClick={() => handleStatusSelect('skipped')}
+            disabled={isSubmitting}
           >
             跳过
           </Button>
           <Button
             className={classnames(styles.actionBtn, styles.failBtn)}
             onClick={() => handleStatusSelect('failed')}
+            disabled={isSubmitting}
           >
             异常
           </Button>
           <Button
             className={classnames(styles.actionBtn, styles.passBtn)}
             onClick={() => handleStatusSelect('passed')}
+            disabled={isSubmitting || (tempBlocked && !state.matchingVerified && itemKey === 'precooling')}
           >
-            通过
+            {isLastItem ? '完成检查' : '通过'}
           </Button>
         </View>
       </View>

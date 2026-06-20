@@ -45,9 +45,72 @@
   opacity: 0.8;
 }
 
+.searchSection {
+  display: flex;
+  gap: $spacing-sm;
+  padding: 0 $spacing-lg;
+  margin-top: -$spacing-lg;
+  margin-bottom: $spacing-md;
+}
+
+.searchBox {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: 0 $spacing-md;
+  box-shadow: $shadow-card;
+  height: 80rpx;
+}
+
+.searchIcon {
+  font-size: $font-size-lg;
+  margin-right: $spacing-sm;
+}
+
+.searchInput {
+  flex: 1;
+  height: 100%;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+}
+
+.clearBtn {
+  @include button-reset;
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: $radius-round;
+  background: $color-bg-hover;
+  color: $color-text-secondary;
+  font-size: $font-size-lg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.reliefEntryBtn {
+  @include button-reset;
+  flex-shrink: 0;
+  width: 140rpx;
+  height: 80rpx;
+  border-radius: $radius-lg;
+  background: linear-gradient(135deg, #FFAB00 0%, #FFC107 100%);
+  color: $color-text-white;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  box-shadow: $shadow-card;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+}
+
 .content {
   padding: 0 $spacing-lg $spacing-xl;
-  margin-top: -$spacing-lg;
 }
 
 .list {
@@ -94,4 +157,161 @@
   font-size: $font-size-sm;
   color: $color-text-secondary;
   line-height: $line-height-loose;
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: $spacing-xl;
+}
+
+.modalContent {
+  width: 100%;
+  max-width: 640rpx;
+  background: $color-bg-card;
+  border-radius: $radius-xl;
+  padding: $spacing-xl;
+  box-shadow: 0 16rpx 48rpx rgba(0, 0, 0, 0.2);
+}
+
+.modalTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  text-align: center;
+  margin-bottom: $spacing-lg;
+}
+
+.selectedTaskInfo {
+  display: flex;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background: $color-bg-page;
+  border-radius: $radius-lg;
+  margin-bottom: $spacing-md;
+}
+
+.selectedTaskPlate {
+  flex-shrink: 0;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-md;
+  padding: $spacing-sm $spacing-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.selectedTaskPlateText {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+}
+
+.selectedTaskDetails {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+  justify-content: center;
+}
+
+.selectedTaskDriver,
+.selectedTaskTime,
+.selectedTaskWaybill {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.waybillPreviewCard {
+  background: rgba(30, 136, 229, 0.05);
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  margin-bottom: $spacing-md;
+}
+
+.waybillPreviewRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.waybillPreviewLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.waybillPreviewValue {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.inputSection {
+  margin-bottom: $spacing-lg;
+}
+
+.inputLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-sm;
+  display: block;
+}
+
+.nameInput {
+  width: 100%;
+  height: $button-height-lg;
+  padding: 0 $spacing-md;
+  border: 2rpx solid $color-border;
+  border-radius: $radius-lg;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  background: $color-bg-page;
+  box-sizing: border-box;
+  transition: all $transition-base;
+
+  &:focus {
+    border-color: $color-primary;
+  }
+}
+
+.modalBtns {
+  display: flex;
+  gap: $spacing-md;
+}
+
+.modalBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.modalCancel {
+  background: $color-bg-hover;
+  color: $color-text-secondary;
+}
+
+.modalConfirm {
+  background: linear-gradient(135deg, #FFAB00 0%, #FFC107 100%);
+  color: $color-text-white;
 }

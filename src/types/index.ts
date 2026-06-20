@@ -8,11 +8,14 @@ export interface Task {
   id: string;
   plateNumber: string;
   driverName: string;
+  originalDriverName?: string;
   departureTime: string;
+  departureTimestamp: number;
   destination: string;
   status: 'pending' | 'inspecting' | 'completed';
   tempZone: TempZoneType;
   waybillNo: string;
+  isRelief?: boolean;
 }
 
 export interface InspectionItem {
@@ -30,6 +33,10 @@ export interface InspectionRecord {
   taskId: string;
   plateNumber: string;
   driverName: string;
+  originalDriverName?: string;
+  inspectorName?: string;
+  departureTime: string;
+  waybillNo: string;
   items: Record<InspectionItemKey, {
     status: CheckStatus;
     photo?: string;
@@ -53,12 +60,22 @@ export interface WaybillInfo {
 
 export interface DriverInspectionStatus {
   driverName: string;
+  originalDriverName?: string;
+  inspectorName?: string;
   plateNumber: string;
+  departureTime: string;
+  departureTimestamp: number;
   completedItems: number;
   totalItems: number;
   skippedItems: InspectionItemKey[];
+  failedItems: InspectionItemKey[];
   status: 'pending' | 'in_progress' | 'completed';
   lastUpdateTime: number;
+  recordId?: string;
+  isRelief?: boolean;
+  tempZone?: TempZoneType;
+  currentTemp?: number;
+  waybillNo?: string;
 }
 
 export interface TempZoneConfig {

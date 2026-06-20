@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
-import { View, Text, Input, Button } from '@tarojs/components';
+import React, { useState, useMemo } from 'react';
+import { View, Text, Input, Button, ScrollView } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import classnames from 'classnames';
 import styles from './index.module.scss';
-import { WaybillInfo } from '@/types';
-import { MOCK_WAYBILLS } from '@/data/mock';
+import { WaybillInfo, Task } from '@/types';
+import { MOCK_WAYBILLS, MOCK_TASKS } from '@/data/mock';
 import { checkTempMatch, getTempZoneConfig } from '@/data/inspection';
 import TempZoneTag from '@/components/TempZoneTag';
+import { useInspection } from '@/store/inspection.context';
 
 const MatchingPage: React.FC = () => {
   const [waybillNo, setWaybillNo] = useState('');
@@ -15,6 +16,12 @@ const MatchingPage: React.FC = () => {
   const [verifyResult, setVerifyResult] = useState<'success' | 'error' | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [queryError, setQueryError] = useState('');
+  const { setMatchingData, resetInspection, startInspection } = useInspection();
+
+  const matchedTask = useMemo(() => {
+    if (!waybillInfo) return null;
+    return MOCK_TASKS.find(t => t.waybillNo === waybillInfo.waybillNo) || null;
+  }, [waybillInfo]);
 
   const handleScan = async () => {
     try {
@@ -95,6 +102,38 @@ const MatchingPage: React.FC = () => {
     });
   };
 
+  const handleStartInspection = () => {
+    if (!waybillInfo || verifyResult !== 'success') return;
+    
+    const temp = parseFloat(currentTemp);
+    if (isNaN(temp)) return;
+
+    resetInspection();
+    setMatchingData({
+      temp: temp,
+      waybillNo: waybillInfo.waybillNo,
+      tempZone: waybillInfo.tempZone,
+      verified: true
+    });
+
+    if (matchedTask) {
+      startInspection(matchedTask);
+      Taro.navigateTo({ url: '/pages/inspection-detail/index?itemKey=precooling' });
+    } else {
+      Taro.showModal({
+        title: '未找到对应任务',
+        content: '已记录温区和温度信息，请前往出车检查页面手动选择车辆。',
+        confirmText: '前往出车检查',
+        cancelText: '知道了',
+        success: (res) => {
+          if (res.confirm) {
+            Taro.switchTab({ url: '/pages/inspection/index' });
+          }
+        }
+      });
+    }
+  };
+
   const handleReset = () => {
     setWaybillNo('');
     setWaybillInfo(null);
@@ -104,7 +143,7 @@ const MatchingPage: React.FC = () => {
   };
 
   return (
-    <View className={styles.page}>
+    <ScrollView className={styles.page} scrollY>
       <View className={styles.header}>
         <Text className={styles.title}>货品温区匹配</Text>
         <Text className={styles.subtitle}>扫码或输入装车单号，验证温区是否匹配</Text>
@@ -113,7 +152,7 @@ const MatchingPage: React.FC = () => {
       <View className={styles.inputSection}>
         <View className={styles.inputRow}>
           <Button className={styles.scanBtn} onClick={handleScan}>
-            扫码
+            📷 扫码
           </Button>
           <View className={styles.inputWrapper}>
             <Input
@@ -165,6 +204,23 @@ const MatchingPage: React.FC = () => {
             <Text className={styles.infoLabel}>目标温度</Text>
             <Text className={styles.infoValue}>{waybillInfo.targetTemp}</Text>
           </View>
+          {matchedTask && (
+            <View className={styles.taskInfoCard}>
+              <Text className={styles.taskInfoTitle}>🚚 关联出车任务</Text>
+              <View className={styles.taskInfoRow}>
+                <Text className={styles.taskInfoLabel}>车牌号</Text>
+                <Text className={styles.taskInfoValue}>{matchedTask.plateNumber}</Text>
+              </View>
+              <View className={styles.taskInfoRow}>
+                <Text className={styles.taskInfoLabel}>司机</Text>
+                <Text className={styles.taskInfoValue}>{matchedTask.driverName}</Text>
+              </View>
+              <View className={styles.taskInfoRow}>
+                <Text className={styles.taskInfoLabel}>发车时间</Text>
+                <Text className={styles.taskInfoValue}>{matchedTask.departureTime}</Text>
+              </View>
+            </View>
+          )}
         </View>
       )}
 
@@ -212,7 +268,7 @@ const MatchingPage: React.FC = () => {
           </View>
           <Text className={styles.resultDesc}>
             {verifyResult === 'success'
-              ? `当前温度 ${currentTemp}℃ 符合${getTempZoneConfig(waybillInfo.tempZone).label}区要求，可以装车。`
+              ? `当前温度 ${currentTemp}℃ 符合${getTempZoneConfig(waybillInfo.tempZone).label}区要求，可以进行出车检查。`
               : `当前温度 ${currentTemp}℃ 不符合${getTempZoneConfig(waybillInfo.tempZone).label}区要求（${waybillInfo.targetTemp}），请联系仓库复核。`}
           </Text>
           {verifyResult === 'error' && (
@@ -221,7 +277,7 @@ const MatchingPage: React.FC = () => {
                 重新输入
               </Button>
               <Button className={styles.primaryBtn} onClick={handleContactWarehouse}>
-                联系仓库
+                📞 联系仓库
               </Button>
             </View>
           )}
@@ -237,7 +293,18 @@ const MatchingPage: React.FC = () => {
           {isVerifying ? '验证中...' : '验证温度匹配'}
         </Button>
       )}
-    </View>
+
+      {waybillInfo && verifyResult === 'success' && (
+        <View className={styles.startInspectionSection}>
+          <Button className={styles.startInspectionBtn} onClick={handleStartInspection}>
+            🚀 进入出车检查
+          </Button>
+          <Text className={styles.startInspectionHint}>
+            将带着温区信息和已验证的温度进入检查流程
+          </Text>
+        </View>
+      )}
+    </ScrollView>
   );
 };
 

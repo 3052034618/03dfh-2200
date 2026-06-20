@@ -3,18 +3,25 @@
 .page {
   min-height: 100vh;
   background: $color-bg-page;
+  padding-bottom: calc(env(safe-area-inset-bottom) + #{$spacing-lg});
 }
 
 .statsSection {
   background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
   padding: $spacing-xl $spacing-lg $spacing-xxl;
+  color: $color-text-white;
 }
 
 .sectionTitle {
-  font-size: $font-size-lg;
-  font-weight: $font-weight-semibold;
-  color: $color-text-white;
-  margin-bottom: $spacing-md;
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  margin-bottom: $spacing-xs;
+}
+
+.sectionSubtitle {
+  font-size: $font-size-sm;
+  opacity: 0.85;
+  margin-bottom: $spacing-lg;
 }
 
 .statsRow {
@@ -25,245 +32,71 @@
 .statCard {
   flex: 1;
   background: rgba(255, 255, 255, 0.15);
-  border-radius: $radius-lg;
+  border-radius: $radius-md;
   padding: $spacing-md;
   text-align: center;
-  backdrop-filter: blur(10rpx);
+  transition: all $transition-base;
+}
+
+.statCard.statUrgent {
+  background: rgba(255, 109, 0, 0.9);
+  box-shadow: 0 4rpx 16rpx rgba(255, 109, 0, 0.4);
 }
 
 .statValue {
   font-size: $font-size-xxl;
   font-weight: $font-weight-bold;
-  color: $color-text-white;
-  line-height: 1.2;
+  line-height: 1;
+  margin-bottom: $spacing-xs;
 }
 
 .statLabel {
   font-size: $font-size-xs;
-  color: rgba(255, 255, 255, 0.8);
-  margin-top: $spacing-xs;
-}
-
-.statHighlight {
-  background: rgba(255, 109, 0, 0.3);
-  .statValue {
-    color: #FFF3E0;
-  }
+  opacity: 0.9;
 }
 
 .filterSection {
-  padding: $spacing-md $spacing-lg;
+  padding: 0 $spacing-lg;
   margin-top: -$spacing-lg;
+  margin-bottom: $spacing-md;
+}
+
+.filterScroll {
+  white-space: nowrap;
 }
 
 .filterRow {
-  display: flex;
+  display: inline-flex;
   gap: $spacing-sm;
-  background: $color-bg-card;
-  border-radius: $radius-button;
-  padding: $spacing-xs;
-  box-shadow: $shadow-card;
+  padding: $spacing-xs 0;
 }
 
 .filterBtn {
   @include button-reset;
-  flex: 1;
+  flex-shrink: 0;
   height: 64rpx;
-  border-radius: $radius-button;
-  font-size: $font-size-sm;
+  padding: 0 $spacing-md;
+  border-radius: $radius-round;
+  background: $color-bg-card;
   color: $color-text-secondary;
-  background: transparent;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  box-shadow: $shadow-card;
   transition: all $transition-base;
 
   &.active {
-    background: $color-primary;
-    color: $color-text-white;
-  }
-
-  &:active {
-    opacity: 0.8;
-  }
-}
-
-.listSection {
-  padding: 0 $spacing-lg $spacing-xl;
-}
-
-.driverCard {
-  background: $color-bg-card;
-  border-radius: $radius-lg;
-  margin-bottom: $spacing-md;
-  box-shadow: $shadow-card;
-  overflow: hidden;
-  transition: all $transition-base;
-}
-
-.driverCardHeader {
-  display: flex;
-  align-items: center;
-  padding: $spacing-lg;
-  cursor: pointer;
-
-  &:active {
-    background: $color-bg-hover;
-  }
-}
-
-.plateSection {
-  flex: 1;
-  min-width: 0;
-}
-
-.plateNumber {
-  display: inline-block;
-  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
-  padding: $spacing-xs $spacing-md;
-  border-radius: $radius-sm;
-  margin-bottom: $spacing-xs;
-}
-
-.plateText {
-  color: $color-text-white;
-  font-size: $font-size-lg;
-  font-weight: $font-weight-semibold;
-  letter-spacing: 1rpx;
-}
-
-.driverName {
-  font-size: $font-size-md;
-  color: $color-text-primary;
-  font-weight: $font-weight-medium;
-}
-
-.progressSection {
-  flex-shrink: 0;
-  text-align: right;
-  margin-right: $spacing-md;
-}
-
-.progressText {
-  font-size: $font-size-lg;
-  font-weight: $font-weight-bold;
-  color: $color-primary;
-  margin-bottom: $spacing-xs;
-}
-
-.progressBar {
-  width: 160rpx;
-  height: 8rpx;
-  background: $color-bg-hover;
-  border-radius: $radius-round;
-  overflow: hidden;
-}
-
-.progressFill {
-  height: 100%;
-  background: linear-gradient(90deg, $color-primary 0%, $color-primary-light 100%);
-  border-radius: $radius-round;
-  transition: width $transition-base;
-}
-
-.warningBadge {
-  flex-shrink: 0;
-  background: rgba(255, 109, 0, 0.1);
-  padding: $spacing-xs $spacing-sm;
-  border-radius: $radius-xs;
-  margin-right: $spacing-sm;
-}
-
-.warningText {
-  font-size: $font-size-xs;
-  color: $color-warning;
-  font-weight: $font-weight-semibold;
-}
-
-.arrowIcon {
-  flex-shrink: 0;
-  font-size: $font-size-xl;
-  color: $color-text-tertiary;
-  transition: transform $transition-base;
-
-  &.expanded {
-    transform: rotate(90deg);
-  }
-}
-
-.driverCardDetail {
-  padding: 0 $spacing-lg $spacing-lg;
-  border-top: 1rpx solid $color-divider;
-}
-
-.detailRow {
-  display: flex;
-  align-items: flex-start;
-  padding-top: $spacing-md;
-}
-
-.detailLabel {
-  width: 120rpx;
-  font-size: $font-size-sm;
-  color: $color-text-secondary;
-  flex-shrink: 0;
-  padding-top: 4rpx;
-}
-
-.detailValue {
-  flex: 1;
-}
-
-.skippedItems {
-  display: flex;
-  flex-wrap: wrap;
-  gap: $spacing-sm;
-}
-
-.skippedTag {
-  background: rgba(255, 109, 0, 0.1);
-  border: 1rpx solid rgba(255, 109, 0, 0.3);
-  padding: $spacing-xs $spacing-sm;
-  border-radius: $radius-xs;
-}
-
-.skippedTagText {
-  font-size: $font-size-xs;
-  color: $color-warning;
-  font-weight: $font-weight-medium;
-}
-
-.updateTime {
-  font-size: $font-size-xs;
-  color: $color-text-tertiary;
-}
-
-.actionRow {
-  display: flex;
-  gap: $spacing-md;
-  margin-top: $spacing-md;
-}
-
-.actionBtn {
-  @include button-reset;
-  flex: 1;
-  height: $button-height-sm;
-  border-radius: $radius-button;
-  font-size: $font-size-sm;
-  font-weight: $font-weight-medium;
-  transition: all $transition-base;
-
-  &.secondary {
-    background: $color-bg-hover;
-    color: $color-text-secondary;
-  }
-
-  &.primary {
     background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
     color: $color-text-white;
   }
 
   &:active {
-    opacity: 0.9;
-    transform: scale(0.98);
+    transform: scale(0.97);
   }
+}
+
+.listSection {
+  padding: 0 $spacing-lg;
+  height: calc(100vh - 400rpx);
 }
 
 .emptyState {
@@ -287,8 +120,473 @@
   color: $color-text-secondary;
 }
 
-.itemTitle {
+.driverCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+  border: 2rpx solid transparent;
+  overflow: hidden;
+  transition: all $transition-base;
+}
+
+.driverCardUrgent {
+  border-color: $color-warning;
+  background: rgba(255, 109, 0, 0.03);
+}
+
+.driverCardFailed {
+  border-color: $color-error;
+  background: rgba(213, 0, 0, 0.03);
+}
+
+.driverCardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: $spacing-lg;
+}
+
+.plateSection {
+  display: flex;
+  gap: $spacing-md;
+  align-items: center;
+  flex: 1;
+}
+
+.plateNumber {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  padding: $spacing-xs $spacing-md;
+  border-radius: $radius-sm;
+  flex-shrink: 0;
+}
+
+.plateText {
+  color: $color-text-white;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  letter-spacing: 2rpx;
+}
+
+.driverInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+  min-width: 0;
+}
+
+.driverName {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.reliefTag {
+  font-size: $font-size-xs;
+  color: #FFAB00;
+  font-weight: $font-weight-medium;
+}
+
+.originalDriver {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.rightSection {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: $spacing-xs;
+}
+
+.departureInfo {
+  text-align: right;
+}
+
+.departureTime {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+}
+
+.countdownText {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.countdownUrgent {
+  color: $color-error;
+  font-weight: $font-weight-semibold;
+}
+
+.progressBarSection {
+  padding: 0 $spacing-lg $spacing-md;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.progressRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+}
+
+.progressLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.progressValue {
   font-size: $font-size-sm;
   color: $color-text-primary;
+  font-weight: $font-weight-semibold;
+}
+
+.progressBar {
+  height: 8rpx;
+  background: $color-bg-hover;
+  border-radius: $radius-round;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-round;
+  transition: width $transition-base;
+}
+
+.progressComplete {
+  background: linear-gradient(90deg, $color-success 0%, #00E676 100%);
+}
+
+.progressWarning {
+  background: linear-gradient(90deg, $color-warning 0%, #FFAB40 100%);
+}
+
+.issueTags {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-top: $spacing-sm;
+  flex-wrap: wrap;
+}
+
+.issueTag {
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-xs;
+}
+
+.issueSkip {
+  background: rgba(255, 109, 0, 0.1);
+}
+
+.issueFail {
+  background: rgba(213, 0, 0, 0.1);
+}
+
+.issueTagText {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+
+.issueSkip .issueTagText {
+  color: $color-warning;
+}
+
+.issueFail .issueTagText {
+  color: $color-error;
+}
+
+.driverCardDetail {
+  padding: $spacing-lg;
+  background: rgba(30, 136, 229, 0.02);
+}
+
+.detailHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.detailTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.waybillText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.itemsList {
+  margin-bottom: $spacing-md;
+}
+
+.detailItem {
+  display: flex;
+  gap: $spacing-md;
+  padding: $spacing-md 0;
+  border-bottom: 1rpx solid $color-divider;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.detailItemIndex {
+  width: 48rpx;
+  height: 48rpx;
+  background: $color-bg-hover;
+  border-radius: $radius-sm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  color: $color-text-secondary;
+  flex-shrink: 0;
+}
+
+.detailItemContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.detailItemHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-xs;
+}
+
+.detailItemName {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.itemBadge {
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-xs;
+  flex-shrink: 0;
+}
+
+.itemBadgeText {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+}
+
+.badgePassed {
+  background: rgba(0, 200, 83, 0.1);
+
+  .itemBadgeText {
+    color: $color-success;
+  }
+}
+
+.badgeSkipped {
+  background: rgba(255, 109, 0, 0.1);
+
+  .itemBadgeText {
+    color: $color-warning;
+  }
+}
+
+.badgeFailed {
+  background: rgba(213, 0, 0, 0.1);
+
+  .itemBadgeText {
+    color: $color-error;
+  }
+}
+
+.badgePending {
+  background: rgba(158, 158, 158, 0.1);
+
+  .itemBadgeText {
+    color: $color-text-secondary;
+  }
+}
+
+.detailItemRemark {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-bottom: $spacing-sm;
+}
+
+.detailItemPhoto {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-top: $spacing-sm;
+}
+
+.photoThumb {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: $radius-sm;
+  background: $color-bg-hover;
+}
+
+.photoLabel {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.noPhotoText {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: $spacing-sm;
+}
+
+.tempSection {
+  background: rgba(30, 136, 229, 0.05);
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  margin-bottom: $spacing-md;
+}
+
+.tempSectionTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-primary;
+  margin-bottom: $spacing-md;
+}
+
+.tempRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-sm;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.tempLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.tempValue {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+}
+
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.detailLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.detailValue {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.actionRow {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.actionBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-md;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.actionBtn.secondary {
+  background: $color-bg-hover;
+  color: $color-text-secondary;
+}
+
+.actionBtn.primary {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+}
+
+.expandIndicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-xs;
+  padding: $spacing-sm $spacing-lg;
+  border-top: 1rpx solid $color-divider;
+  background: $color-bg-hover;
+  transition: all $transition-base;
+}
+
+.expandIndicator.expanded {
+  background: rgba(30, 136, 229, 0.05);
+}
+
+.expandText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.expandArrow {
+  font-size: $font-size-lg;
+  color: $color-text-tertiary;
+  transition: transform $transition-base;
+  line-height: 1;
+}
+
+.expanded .expandArrow {
+  transform: rotate(90deg);
+}
+
+.photoViewer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.viewerImage {
+  width: 90%;
+  height: 80%;
+}
+
+.viewerClose {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + #{$spacing-lg});
+  right: $spacing-lg;
+  background: rgba(255, 255, 255, 0.2);
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-md;
+}
+
+.viewerCloseText {
+  color: $color-text-white;
+  font-size: $font-size-md;
   font-weight: $font-weight-medium;
 }

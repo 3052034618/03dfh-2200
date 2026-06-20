@@ -366,3 +366,46 @@
   font-weight: $font-weight-medium;
   line-height: $line-height-loose;
 }
+
+.reliefBadge {
+  background: rgba(255, 171, 0, 0.2);
+  border: 2rpx solid rgba(255, 171, 0, 0.5);
+  border-radius: $radius-sm;
+  padding: $spacing-xs $spacing-sm;
+  margin-bottom: $spacing-md;
+  align-self: flex-start;
+}
+
+.reliefText {
+  font-size: $font-size-sm;
+  color: #FFAB00;
+  font-weight: $font-weight-medium;
+}
+
+.matchVerifiedCard {
+  margin-top: $spacing-md;
+  background: rgba(0, 200, 83, 0.1);
+  border: 2rpx solid rgba(0, 200, 83, 0.3);
+  border-radius: $radius-sm;
+  padding: $spacing-sm $spacing-md;
+}
+
+.matchVerifiedText {
+  font-size: $font-size-sm;
+  color: $color-success;
+  font-weight: $font-weight-medium;
+}
+
+.tempWarningCard {
+  margin-top: $spacing-sm;
+  background: rgba(255, 109, 0, 0.08);
+  border: 2rpx solid rgba(255, 109, 0, 0.3);
+  border-radius: $radius-sm;
+  padding: $spacing-sm $spacing-md;
+}
+
+.tempWarningText {
+  font-size: $font-size-sm;
+  color: $color-warning;
+  font-weight: $font-weight-medium;
+}
