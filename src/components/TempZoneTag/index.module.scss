@@ -1,0 +1,46 @@
+@use '@/styles/variables.scss' as *;
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: 0 $spacing-sm;
+  height: 40rpx;
+  border-radius: $radius-xs;
+  border: 1rpx solid;
+
+  &.small {
+    height: 32rpx;
+    padding: 0 $spacing-xs;
+  }
+
+  &.large {
+    height: 48rpx;
+    padding: 0 $spacing-md;
+  }
+}
+
+.label {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  line-height: 1;
+
+  .small & {
+    font-size: $font-size-xs;
+  }
+
+  .large & {
+    font-size: $font-size-md;
+  }
+}
+
+.temp {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  line-height: 1;
+  opacity: 0.8;
+
+  .small & {
+    display: none;
+  }
+}

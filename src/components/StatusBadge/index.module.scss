@@ -1,0 +1,56 @@
+@use '@/styles/variables.scss' as *;
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 $spacing-sm;
+  height: 40rpx;
+  border-radius: $radius-xs;
+  background: $color-bg-hover;
+
+  &.small {
+    height: 32rpx;
+    padding: 0 $spacing-xs;
+  }
+}
+
+.text {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  line-height: 1;
+
+  .small & {
+    font-size: $font-size-xs;
+  }
+}
+
+.pending {
+  background: rgba(134, 144, 156, 0.1);
+  .text { color: $color-text-tertiary; }
+}
+
+.passed {
+  background: rgba(0, 200, 83, 0.1);
+  .text { color: $color-success; }
+}
+
+.skipped {
+  background: rgba(255, 109, 0, 0.1);
+  .text { color: $color-warning; }
+}
+
+.failed {
+  background: rgba(213, 0, 0, 0.1);
+  .text { color: $color-error; }
+}
+
+.inProgress {
+  background: rgba(30, 136, 229, 0.1);
+  .text { color: $color-primary; }
+}
+
+.completed {
+  background: rgba(0, 200, 83, 0.1);
+  .text { color: $color-success; }
+}

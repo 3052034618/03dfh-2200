@@ -1,0 +1,154 @@
+@use '@/styles/variables.scss' as *;
+
+.card {
+  display: flex;
+  align-items: stretch;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+  border: 2rpx solid transparent;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.99);
+    opacity: 0.95;
+  }
+
+  &.passed {
+    border-color: $color-success;
+  }
+
+  &.skipped {
+    border-color: $color-warning;
+  }
+
+  &.failed {
+    border-color: $color-error;
+  }
+}
+
+.indexBadge {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: $radius-sm;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: $spacing-md;
+  flex-shrink: 0;
+}
+
+.indexText {
+  color: $color-text-white;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-xs;
+}
+
+.title {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis;
+  flex: 1;
+  margin-right: $spacing-sm;
+}
+
+.description {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-sm;
+  @include text-ellipsis-multi(1);
+}
+
+.previewRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.imagePreview {
+  position: relative;
+  width: 160rpx;
+  height: 100rpx;
+  border-radius: $radius-sm;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+}
+
+.photoTag {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: $color-success;
+  padding: 2rpx 8rpx;
+  border-bottom-left-radius: $radius-xs;
+}
+
+.photoText {
+  color: $color-text-white;
+  font-size: 18rpx;
+  font-weight: $font-weight-medium;
+}
+
+.statusIcon {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: $radius-round;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $color-success;
+  flex-shrink: 0;
+}
+
+.iconText {
+  color: $color-text-white;
+  font-size: $font-size-md;
+  font-weight: $font-weight-bold;
+}
+
+.passed .statusIcon {
+  background: $color-success;
+}
+
+.skipped .statusIcon {
+  background: $color-warning;
+}
+
+.failed .statusIcon {
+  background: $color-error;
+}
+
+.arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 $spacing-sm;
+  flex-shrink: 0;
+}
+
+.arrowText {
+  font-size: $font-size-lg;
+  color: $color-text-tertiary;
+  font-weight: $font-weight-bold;
+}

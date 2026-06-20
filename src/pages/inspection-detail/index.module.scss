@@ -1,0 +1,368 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 200rpx;
+}
+
+.header {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  padding: $spacing-lg;
+  color: $color-text-white;
+}
+
+.progressSection {
+  margin-bottom: $spacing-md;
+}
+
+.progressLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+}
+
+.progressText {
+  font-size: $font-size-sm;
+  opacity: 0.9;
+}
+
+.progressBar {
+  height: 8rpx;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: $radius-round;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: $color-text-white;
+  border-radius: $radius-round;
+  transition: width $transition-base;
+}
+
+.itemHeader {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.itemIndex {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: $radius-sm;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.itemIndexText {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+}
+
+.itemTitle {
+  flex: 1;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  @include text-ellipsis;
+}
+
+.content {
+  padding: $spacing-lg;
+}
+
+.section {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+}
+
+.tempInputSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $spacing-xl 0;
+}
+
+.tempInputWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: $spacing-md;
+}
+
+.tempInput {
+  width: 280rpx;
+  height: 120rpx;
+  font-size: 80rpx;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  text-align: center;
+  border: 2rpx solid $color-border;
+  border-radius: $radius-lg;
+  background: $color-bg-page;
+  transition: all $transition-base;
+
+  &:focus {
+    border-color: $color-primary;
+  }
+}
+
+.tempUnit {
+  font-size: $font-size-xl;
+  color: $color-text-secondary;
+  margin-left: $spacing-md;
+}
+
+.tempHint {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  text-align: center;
+}
+
+.exampleImageWrapper {
+  position: relative;
+  width: 100%;
+  height: 400rpx;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  margin-bottom: $spacing-md;
+}
+
+.exampleImage {
+  width: 100%;
+  height: 100%;
+}
+
+.exampleLabel {
+  position: absolute;
+  top: $spacing-sm;
+  left: $spacing-sm;
+  background: rgba(0, 0, 0, 0.6);
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-xs;
+}
+
+.exampleLabelText {
+  color: $color-text-white;
+  font-size: $font-size-xs;
+}
+
+.infoBlock {
+  margin-bottom: $spacing-md;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.infoLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-xs;
+}
+
+.infoText {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  line-height: $line-height-loose;
+}
+
+.photoSection {
+  margin-top: $spacing-md;
+}
+
+.photoBtn {
+  @include button-reset;
+  width: 100%;
+  height: $button-height-lg;
+  border-radius: $radius-lg;
+  border: 2rpx dashed $color-primary;
+  background: rgba(30, 136, 229, 0.05);
+  color: $color-primary;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.8;
+    transform: scale(0.99);
+  }
+}
+
+.photoPreview {
+  position: relative;
+  width: 100%;
+  height: 400rpx;
+  border-radius: $radius-lg;
+  overflow: hidden;
+}
+
+.photoImage {
+  width: 100%;
+  height: 100%;
+}
+
+.photoTag {
+  position: absolute;
+  top: $spacing-sm;
+  right: $spacing-sm;
+  background: $color-success;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-xs;
+}
+
+.photoTagText {
+  color: $color-text-white;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+
+.removePhotoBtn {
+  @include button-reset;
+  position: absolute;
+  top: $spacing-sm;
+  left: $spacing-sm;
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: $radius-round;
+  background: rgba(213, 0, 0, 0.8);
+  color: $color-text-white;
+  font-size: $font-size-sm;
+}
+
+.bottomBar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: $color-bg-card;
+  padding: $spacing-md $spacing-lg calc(env(safe-area-inset-bottom) + #{$spacing-md});
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.08);
+  display: flex;
+  gap: $spacing-md;
+}
+
+.navBtn {
+  @include button-reset;
+  flex-shrink: 0;
+  width: 120rpx;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: $color-bg-hover;
+  color: $color-text-secondary;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.8;
+  }
+
+  &[disabled] {
+    opacity: 0.4;
+  }
+}
+
+.actionBtns {
+  flex: 1;
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.actionBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.passBtn {
+  background: linear-gradient(135deg, $color-success 0%, #00E676 100%);
+  color: $color-text-white;
+}
+
+.skipBtn {
+  background: $color-bg-hover;
+  color: $color-warning;
+  border: 2rpx solid $color-warning;
+}
+
+.failBtn {
+  background: linear-gradient(135deg, $color-error 0%, #FF5252 100%);
+  color: $color-text-white;
+}
+
+.remarkSection {
+  margin-top: $spacing-md;
+}
+
+.remarkInput {
+  width: 100%;
+  min-height: 120rpx;
+  padding: $spacing-md;
+  border: 2rpx solid $color-border;
+  border-radius: $radius-lg;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  background: $color-bg-page;
+  box-sizing: border-box;
+  transition: all $transition-base;
+
+  &:focus {
+    border-color: $color-primary;
+  }
+}
+
+.tempDisplay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-lg 0;
+  gap: $spacing-sm;
+}
+
+.tempValue {
+  font-size: 72rpx;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+}
+
+.tempUnitDisplay {
+  font-size: $font-size-xl;
+  color: $color-text-secondary;
+}
+
+.standardCard {
+  background: rgba(30, 136, 229, 0.05);
+  border-left: 4rpx solid $color-primary;
+  padding: $spacing-md;
+  border-radius: 0 $radius-sm $radius-sm 0;
+}
+
+.standardText {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+  line-height: $line-height-loose;
+}
