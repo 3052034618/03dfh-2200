@@ -58,10 +58,10 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onStart, onRelief }) => {
         </View>
       </View>
 
-      {task.originalDriverName && (
+      {task.isRelief && task.inspectorName && (
         <View className={styles.reliefInfo}>
           <Text className={styles.reliefInfoText}>
-            🔄 原司机：{task.originalDriverName}
+            🔄 {task.originalDriverName || task.driverName} → {task.inspectorName} 代检
           </Text>
         </View>
       )}
@@ -69,7 +69,10 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onStart, onRelief }) => {
       <View className={styles.body}>
         <View className={styles.infoRow}>
           <Text className={styles.label}>司机</Text>
-          <Text className={styles.value}>{task.driverName}</Text>
+          <Text className={styles.value}>
+            {task.originalDriverName || task.driverName}
+            {task.isRelief && task.inspectorName && `（代检：${task.inspectorName}）`}
+          </Text>
         </View>
         <View className={styles.infoRow}>
           <Text className={styles.label}>发车时间</Text>

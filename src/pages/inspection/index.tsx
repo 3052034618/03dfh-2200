@@ -91,7 +91,8 @@ const InspectionPage: React.FC = () => {
     const reliefTask: Task = {
       ...selectedTask,
       originalDriverName: selectedTask.driverName,
-      driverName: reliefName.trim(),
+      driverName: selectedTask.driverName,
+      inspectorName: reliefName.trim(),
       isRelief: true
     };
     

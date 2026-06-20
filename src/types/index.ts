@@ -4,11 +4,23 @@ export type CheckStatus = 'pending' | 'passed' | 'skipped' | 'failed';
 
 export type InspectionItemKey = 'precooling' | 'probe' | 'seal' | 'fuel';
 
+export type ReviewStatus = 'pending_contact' | 'processing' | 'released' | 'blocked';
+
+export type ReviewDecision = 'release' | 'block' | null;
+
+export interface ContactLogEntry {
+  type: 'driver' | 'warehouse';
+  contactedAt: number;
+  contactedBy: string;
+  note?: string;
+}
+
 export interface Task {
   id: string;
   plateNumber: string;
   driverName: string;
   originalDriverName?: string;
+  inspectorName?: string;
   departureTime: string;
   departureTimestamp: number;
   destination: string;
@@ -53,6 +65,13 @@ export interface InspectionRecord {
   matchingVerified?: boolean;
   goodsName?: string;
   targetTemp?: string;
+  reviewStatus?: ReviewStatus;
+  reviewDecision?: ReviewDecision;
+  reviewNote?: string;
+  reviewedAt?: number;
+  reviewedBy?: string;
+  reviewClosedAt?: number;
+  contactLog?: ContactLogEntry[];
 }
 
 export interface WaybillInfo {
@@ -86,6 +105,10 @@ export interface DriverInspectionStatus {
   reviewNote?: string;
   reviewedAt?: number;
   reviewedBy?: string;
+  reviewStatus?: ReviewStatus;
+  reviewDecision?: ReviewDecision;
+  reviewClosedAt?: number;
+  contactLog?: ContactLogEntry[];
 }
 
 export interface TempZoneConfig {

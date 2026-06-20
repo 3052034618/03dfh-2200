@@ -1,16 +1,30 @@
-import React, { useMemo } from 'react';
-import { View, Text, Button } from '@tarojs/components';
+import React, { useMemo, useCallback } from 'react';
+import { View, Text, Button, ScrollView } from '@tarojs/components';
+import { useDidShow } from '@tarojs/taro';
 import Taro from '@tarojs/taro';
 import classnames from 'classnames';
 import dayjs from 'dayjs';
 import styles from './index.module.scss';
-import { CheckStatus, InspectionItemKey } from '@/types';
+import { CheckStatus, InspectionItemKey, DriverInspectionStatus } from '@/types';
 import { INSPECTION_ITEMS, INSPECTION_ITEM_KEYS, getTempZoneConfig } from '@/data/inspection';
 import { useInspection } from '@/store/inspection.context';
+import { storage } from '@/utils/storage';
 import TempZoneTag from '@/components/TempZoneTag';
 
 const InspectionResultPage: React.FC = () => {
   const { state, resetInspection } = useInspection();
+
+  const loadReviewStatus = useCallback((): DriverInspectionStatus | null => {
+    if (!state.currentRecord?.plateNumber) return null;
+    const statuses = storage.getDriverStatuses();
+    return statuses.find(s => s.plateNumber === state.currentRecord?.plateNumber) || null;
+  }, [state.currentRecord]);
+
+  const reviewStatus = useMemo(() => loadReviewStatus(), [loadReviewStatus, state.currentRecord]);
+
+  useDidShow(() => {
+    // 页面显示时刷新复核状态
+  });
 
   const summary = useMemo(() => {
     if (!state.currentRecord) return null;
@@ -281,6 +295,60 @@ const InspectionResultPage: React.FC = () => {
             <Text className={styles.warningText}>
               本次检查中有 {summary!.failed} 项存在异常，请立即联系调度员进行处理，禁止带病出车。
             </Text>
+          </View>
+        )}
+
+        {(reviewStatus?.reviewNote || reviewStatus?.reviewDecision) && (
+          <View className={styles.reviewResultCard}>
+            <Text className={styles.reviewResultTitle}>👨‍💼 班组长复核结果</Text>
+            
+            {reviewStatus.reviewDecision && (
+              <View className={classnames(
+                styles.reviewDecision,
+                reviewStatus.reviewDecision === 'release' ? styles.reviewReleased : styles.reviewBlocked
+              )}>
+                <Text className={styles.reviewDecisionIcon}>
+                  {reviewStatus.reviewDecision === 'release' ? '✅' : '🚫'}
+                </Text>
+                <Text className={styles.reviewDecisionText}>
+                  {reviewStatus.reviewDecision === 'release' ? '已允许发车' : '已拦截，需整改'}
+                </Text>
+                {reviewStatus.reviewClosedAt && (
+                  <Text className={styles.reviewDecisionTime}>
+                    {dayjs(reviewStatus.reviewClosedAt).format('HH:mm')}
+                  </Text>
+                )}
+              </View>
+            )}
+
+            {reviewStatus.reviewNote && (
+              <View className={styles.reviewNoteRow}>
+                <Text className={styles.reviewNoteLabel}>处理结论</Text>
+                <Text className={styles.reviewNoteContent}>{reviewStatus.reviewNote}</Text>
+              </View>
+            )}
+
+            {reviewStatus.reviewedAt && (
+              <Text className={styles.reviewMeta}>
+                由 {reviewStatus.reviewedBy || '班组长'} 于 {dayjs(reviewStatus.reviewedAt).format('HH:mm:ss')} 复核
+              </Text>
+            )}
+
+            {reviewStatus.contactLog && reviewStatus.contactLog.length > 0 && (
+              <View className={styles.contactLogBox}>
+                <Text className={styles.contactLogTitle}>联系记录</Text>
+                {reviewStatus.contactLog.map((log, idx) => (
+                  <View key={idx} className={styles.contactLogItem}>
+                    <Text className={styles.contactLogType}>
+                      {log.type === 'driver' ? '📞 司机' : '📞 仓库'}
+                    </Text>
+                    <Text className={styles.contactLogContent}>
+                      {log.note || '已联系'} · {dayjs(log.contactedAt).format('HH:mm')}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            )}
           </View>
         )}
       </View>

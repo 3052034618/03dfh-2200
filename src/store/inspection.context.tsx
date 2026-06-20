@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
-import { InspectionRecord, InspectionItemKey, CheckStatus, Task, TempZoneType } from '@/types';
+import { InspectionRecord, InspectionItemKey, CheckStatus, Task, TempZoneType, ReviewStatus } from '@/types';
 import { INSPECTION_ITEM_KEYS, checkTempMatch } from '@/data/inspection';
 import { storage } from '@/utils/storage';
 
@@ -54,13 +54,15 @@ const createEmptyRecord = (task: Task, inspectorName?: string | null, isRelief?:
       checkedAt: now
     };
   });
+  const effectiveOriginalDriver = task.originalDriverName || task.driverName;
+  const effectiveInspector = inspectorName || task.inspectorName;
   return {
     id: `REC_${now}`,
     taskId: task.id,
     plateNumber: task.plateNumber,
-    driverName: task.driverName,
-    originalDriverName: isRelief ? task.driverName : undefined,
-    inspectorName: inspectorName || undefined,
+    driverName: effectiveOriginalDriver,
+    originalDriverName: isRelief || task.isRelief ? effectiveOriginalDriver : undefined,
+    inspectorName: (isRelief || task.isRelief) ? effectiveInspector : undefined,
     departureTime: task.departureTime,
     waybillNo: task.waybillNo,
     items,
@@ -145,10 +147,13 @@ const inspectionReducer = (state: InspectionState, action: InspectionAction): In
     case 'UPDATE_ITEM': {
       if (!state.currentRecord) return state;
       const { key, status, photo, remark } = action.payload;
+      const effectiveOriginal = state.currentRecord.originalDriverName || state.currentTask?.originalDriverName || state.currentTask?.driverName;
+      const effectiveInspector = state.inspectorName || state.currentTask?.inspectorName || state.currentRecord.inspectorName;
       const newRecord = {
         ...state.currentRecord,
-        inspectorName: state.inspectorName || state.currentRecord.inspectorName,
-        originalDriverName: state.isReliefInspection ? (state.currentTask?.driverName || state.currentRecord.originalDriverName) : state.currentRecord.originalDriverName,
+        driverName: effectiveOriginal || state.currentRecord.driverName,
+        originalDriverName: (state.isReliefInspection || state.currentTask?.isRelief) ? effectiveOriginal : state.currentRecord.originalDriverName,
+        inspectorName: (state.isReliefInspection || state.currentTask?.isRelief) ? effectiveInspector : state.currentRecord.inspectorName,
         items: {
           ...state.currentRecord.items,
           [key]: {
@@ -168,21 +173,35 @@ const inspectionReducer = (state: InspectionState, action: InspectionAction): In
     }
     case 'COMPLETE_INSPECTION': {
       if (!state.currentRecord || !state.currentTask) return state;
-      const newRecord = {
+      const effectiveOriginal = state.currentRecord.originalDriverName || state.currentTask.originalDriverName || state.currentTask.driverName;
+      const effectiveInspector = state.inspectorName || state.currentTask.inspectorName || state.currentRecord.inspectorName;
+      const isRelief = state.isReliefInspection || state.currentTask.isRelief;
+      const now = Date.now();
+
+      const skippedKeys = INSPECTION_ITEM_KEYS.filter(k => state.currentRecord!.items[k].status === 'skipped');
+      const failedKeys = INSPECTION_ITEM_KEYS.filter(k => state.currentRecord!.items[k].status === 'failed');
+      const hasSkipped = skippedKeys.length > 0;
+      const hasFailed = failedKeys.length > 0;
+      let autoReviewStatus: ReviewStatus | undefined;
+      if (hasSkipped || hasFailed) {
+        autoReviewStatus = 'pending_contact';
+      }
+
+      const newRecord: InspectionRecord = {
         ...state.currentRecord,
-        completedAt: Date.now(),
-        inspectorName: state.inspectorName || state.currentRecord.inspectorName,
-        originalDriverName: state.isReliefInspection ? state.currentTask.driverName : state.currentRecord.originalDriverName
+        driverName: effectiveOriginal || state.currentRecord.driverName,
+        originalDriverName: isRelief ? effectiveOriginal : state.currentRecord.originalDriverName,
+        inspectorName: isRelief ? effectiveInspector : state.currentRecord.inspectorName,
+        completedAt: now,
+        reviewStatus: autoReviewStatus || state.currentRecord.reviewStatus,
+        contactLog: state.currentRecord.contactLog || []
       };
       storage.saveInspectionRecord(newRecord);
       
-      const skippedKeys = INSPECTION_ITEM_KEYS.filter(k => newRecord.items[k].status === 'skipped');
-      const failedKeys = INSPECTION_ITEM_KEYS.filter(k => newRecord.items[k].status === 'failed');
-      
       storage.saveDriverStatus({
-        driverName: state.currentTask.driverName,
-        originalDriverName: state.isReliefInspection ? state.currentTask.driverName : undefined,
-        inspectorName: state.inspectorName || undefined,
+        driverName: effectiveOriginal || state.currentTask.driverName,
+        originalDriverName: isRelief ? effectiveOriginal : undefined,
+        inspectorName: isRelief ? effectiveInspector : undefined,
         plateNumber: state.currentTask.plateNumber,
         departureTime: state.currentTask.departureTime,
         departureTimestamp: state.currentTask.departureTimestamp,
@@ -191,12 +210,16 @@ const inspectionReducer = (state: InspectionState, action: InspectionAction): In
         skippedItems: skippedKeys,
         failedItems: failedKeys,
         status: 'completed',
-        lastUpdateTime: Date.now(),
+        lastUpdateTime: now,
         recordId: newRecord.id,
-        isRelief: state.isReliefInspection,
+        isRelief: isRelief,
         tempZone: state.currentTask.tempZone,
         currentTemp: newRecord.currentTemp,
-        waybillNo: state.currentTask.waybillNo
+        waybillNo: state.currentTask.waybillNo,
+        goodsName: newRecord.goodsName,
+        targetTemp: newRecord.targetTemp,
+        reviewStatus: autoReviewStatus,
+        contactLog: []
       });
       storage.setCurrentTask(null);
       return {

@@ -1024,3 +1024,309 @@
   background: rgba(213, 0, 0, 0.1);
   color: $color-error;
 }
+
+// 处置状态筛选Tab
+.reviewStatusTabs {
+  display: flex;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-md;
+  flex-wrap: wrap;
+}
+
+.reviewStatusTab {
+  @include button-reset;
+  padding: $spacing-xs $spacing-md;
+  border-radius: $radius-round;
+  background: $color-bg-card;
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+  box-shadow: $shadow-card;
+  transition: all $transition-base;
+
+  &.active {
+    background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+    color: $color-text-white;
+  }
+}
+
+.statusTagPending {
+  background: rgba(158, 158, 158, 0.15);
+  color: #757575;
+}
+.statusTagProcessing {
+  background: rgba(33, 150, 243, 0.15);
+  color: #1976D2;
+}
+.statusTagReleased {
+  background: rgba(0, 200, 83, 0.15);
+  color: $color-success;
+}
+.statusTagBlocked {
+  background: rgba(213, 0, 0, 0.15);
+  color: $color-error;
+}
+
+// 处置决策区
+.decisionSection {
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 2rpx dashed $color-divider;
+}
+
+.decisionLabel {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+}
+
+.decisionBtns {
+  display: flex;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+}
+
+.decisionBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-md;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  transition: all $transition-base;
+
+  &.release {
+    background: rgba(0, 200, 83, 0.1);
+    color: $color-success;
+    border: 2rpx solid rgba(0, 200, 83, 0.3);
+
+    &.selected {
+      background: $color-success;
+      color: $color-text-white;
+    }
+  }
+
+  &.block {
+    background: rgba(213, 0, 0, 0.1);
+    color: $color-error;
+    border: 2rpx solid rgba(213, 0, 0, 0.3);
+
+    &.selected {
+      background: $color-error;
+      color: $color-text-white;
+    }
+  }
+}
+
+.decisionSaved {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-sm;
+  margin-bottom: $spacing-sm;
+
+  &.released {
+    background: rgba(0, 200, 83, 0.08);
+    border: 1rpx solid rgba(0, 200, 83, 0.3);
+  }
+  &.blocked {
+    background: rgba(213, 0, 0, 0.08);
+    border: 1rpx solid rgba(213, 0, 0, 0.3);
+  }
+}
+
+.decisionSavedText {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+
+  &.released { color: $color-success; }
+  &.blocked { color: $color-error; }
+}
+
+// 联系记录区
+.contactLogSection {
+  margin-top: $spacing-md;
+}
+
+.contactLogTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.contactAddBtn {
+  @include button-reset;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-xs;
+  background: rgba(33, 150, 243, 0.1);
+  color: #1976D2;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+
+.contactLogList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.contactLogItem {
+  background: $color-bg-hover;
+  border-radius: $radius-sm;
+  padding: $spacing-sm;
+}
+
+.contactLogHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-xs;
+}
+
+.contactLogType {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+
+  &.driver { color: $color-primary; }
+  &.warehouse { color: #FF6D00; }
+}
+
+.contactLogTime {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.contactLogNote {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.contactLogBy {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: 4rpx;
+}
+
+// 异常来源区
+.issueSourceSection {
+  margin-bottom: $spacing-md;
+}
+
+.issueSourceTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+}
+
+.issueSourceItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-xs;
+  margin-bottom: $spacing-xs;
+
+  &.skipped { background: rgba(255, 109, 0, 0.08); }
+  &.failed { background: rgba(213, 0, 0, 0.08); }
+}
+
+.issueSourceIcon {
+  font-size: $font-size-sm;
+}
+
+.issueSourceName {
+  font-size: $font-size-xs;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+// 汇总导出按钮
+.exportSection {
+  margin-bottom: $spacing-md;
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.exportBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-md;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &.secondary {
+    background: $color-bg-card;
+    color: $color-text-primary;
+    box-shadow: $shadow-card;
+  }
+}
+
+// 处置卡片样式增强
+.dispositionCardHeader {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-xs;
+}
+
+.dispositionStatus {
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+}
+
+.unclosedSection {
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 2rpx dashed $color-divider;
+}
+
+.unclosedTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-error;
+  margin-bottom: $spacing-sm;
+}
+
+.unclosedList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.unclosedItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-sm $spacing-md;
+  background: rgba(213, 0, 0, 0.06);
+  border: 1rpx solid rgba(213, 0, 0, 0.2);
+  border-radius: $radius-sm;
+}
+
+.unclosedPlate {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-error;
+}
+
+.unclosedReason {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
