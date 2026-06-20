@@ -590,3 +590,437 @@
   font-size: $font-size-md;
   font-weight: $font-weight-medium;
 }
+
+.reliefLine {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  flex-wrap: wrap;
+}
+
+.reliefFrom {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+}
+
+.reliefArrow {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+  font-weight: $font-weight-bold;
+}
+
+.reliefToTag {
+  background: rgba(255, 171, 0, 0.15);
+  border: 2rpx solid rgba(255, 171, 0, 0.4);
+  border-radius: $radius-xs;
+  padding: 4rpx $spacing-sm;
+}
+
+.reliefToText {
+  font-size: $font-size-sm;
+  color: #FFAB00;
+  font-weight: $font-weight-semibold;
+}
+
+.driverHint {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.reliefDetailCard {
+  background: rgba(255, 171, 0, 0.08);
+  border: 1rpx solid rgba(255, 171, 0, 0.3);
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  margin-bottom: $spacing-md;
+}
+
+.reliefDetailTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: #FFAB00;
+  margin-bottom: $spacing-sm;
+}
+
+.reliefDetailRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.reliefDetailBox {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: $radius-sm;
+  padding: $spacing-sm;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.reliefDetailBoxActive {
+  background: rgba(255, 171, 0, 0.15);
+  border: 2rpx solid rgba(255, 171, 0, 0.4);
+}
+
+.reliefDetailLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.reliefDetailName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.reliefDetailBoxActive .reliefDetailName {
+  color: #FFAB00;
+}
+
+.reliefDetailArrow {
+  font-size: $font-size-lg;
+  color: $color-text-tertiary;
+  font-weight: $font-weight-bold;
+}
+
+.viewTabs {
+  display: flex;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: $radius-round;
+  padding: 6rpx;
+  margin-bottom: $spacing-md;
+}
+
+.viewTabBtn {
+  @include button-reset;
+  flex: 1;
+  height: 64rpx;
+  border-radius: $radius-round;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: rgba(255, 255, 255, 0.8);
+  transition: all $transition-base;
+
+  &.active {
+    background: rgba(255, 255, 255, 0.3);
+    color: $color-text-white;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.pendingSection {
+  padding: 0 $spacing-lg;
+  margin-bottom: $spacing-md;
+}
+
+.pendingSectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.pendingCount {
+  background: $color-error;
+  color: $color-text-white;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  padding: 4rpx 12rpx;
+  border-radius: $radius-round;
+  min-width: 40rpx;
+  text-align: center;
+}
+
+.pendingList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.pendingItem {
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  border-left: 6rpx solid $color-warning;
+  box-shadow: $shadow-card;
+}
+
+.pendingItemUrgent {
+  border-left-color: $color-error;
+  background: rgba(213, 0, 0, 0.03);
+}
+
+.pendingItemHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: $spacing-sm;
+}
+
+.pendingItemPlate {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.pendingItemCountdown {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: $color-error;
+}
+
+.pendingItemInfo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-sm;
+}
+
+.pendingItemTag {
+  font-size: $font-size-xs;
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+}
+
+.tagSkipped {
+  background: rgba(255, 109, 0, 0.1);
+  color: $color-warning;
+}
+
+.tagFailed {
+  background: rgba(213, 0, 0, 0.1);
+  color: $color-error;
+}
+
+.tagUrgent {
+  background: rgba(213, 0, 0, 0.15);
+  color: $color-error;
+  font-weight: $font-weight-medium;
+}
+
+.pendingItemDriver {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-sm;
+}
+
+.pendingItemActions {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.pendingActionBtn {
+  @include button-reset;
+  flex: 1;
+  height: 56rpx;
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+.pendingActionSecondary {
+  background: $color-bg-hover;
+  color: $color-text-secondary;
+}
+
+.pendingActionPrimary {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+}
+
+.pendingActionDanger {
+  background: linear-gradient(135deg, $color-error 0%, #FF5252 100%);
+  color: $color-text-white;
+}
+
+.reviewNoteSection {
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 1rpx solid $color-divider;
+}
+
+.reviewNoteLabel {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+}
+
+.reviewNoteInput {
+  width: 100%;
+  height: 120rpx;
+  background: $color-bg-hover;
+  border-radius: $radius-sm;
+  padding: $spacing-sm $spacing-md;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+  box-sizing: border-box;
+}
+
+.reviewNoteSaved {
+  background: rgba(0, 200, 83, 0.06);
+  border: 1rpx solid rgba(0, 200, 83, 0.2);
+  border-radius: $radius-sm;
+  padding: $spacing-sm $spacing-md;
+  font-size: $font-size-sm;
+  color: $color-success;
+  margin-bottom: $spacing-sm;
+}
+
+.reviewNoteMeta {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: 4rpx;
+}
+
+.summarySection {
+  padding: 0 $spacing-lg;
+}
+
+.summaryGroup {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.summaryGroupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.summaryGroupTitle {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.summaryGroupRate {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+}
+
+.rateGood { color: $color-success; }
+.rateWarning { color: $color-warning; }
+.rateBad { color: $color-error; }
+
+.summaryStats {
+  display: flex;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+}
+
+.summaryStatBox {
+  flex: 1;
+  background: $color-bg-hover;
+  border-radius: $radius-sm;
+  padding: $spacing-sm;
+  text-align: center;
+}
+
+.summaryStatValue {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  line-height: 1.2;
+}
+
+.summaryStatLabel {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  margin-top: 4rpx;
+}
+
+.summaryProgressBar {
+  height: 12rpx;
+  background: $color-bg-hover;
+  border-radius: $radius-round;
+  overflow: hidden;
+  margin-bottom: $spacing-md;
+}
+
+.summaryProgressFill {
+  height: 100%;
+  border-radius: $radius-round;
+  transition: width $transition-base;
+}
+
+.summaryProgressCompleted {
+  background: linear-gradient(90deg, $color-success 0%, #00E676 100%);
+}
+
+.summaryProgressPending {
+  background: linear-gradient(90deg, $color-warning 0%, #FFAB40 100%);
+}
+
+.summaryListTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+}
+
+.summaryList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.summaryListItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-sm $spacing-md;
+  background: $color-bg-hover;
+  border-radius: $radius-sm;
+}
+
+.summaryListPlate {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+}
+
+.summaryListDriver {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.summaryListStatus {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+}
+
+.statusInProgress {
+  background: rgba(24, 144, 255, 0.1);
+  color: $color-primary;
+}
+
+.statusPending {
+  background: rgba(255, 109, 0, 0.1);
+  color: $color-warning;
+}
+
+.statusFailed {
+  background: rgba(213, 0, 0, 0.1);
+  color: $color-error;
+}

@@ -113,18 +113,29 @@ const InspectionResultPage: React.FC = () => {
             <Text className={styles.infoLabel}>车牌号</Text>
             <Text className={styles.infoValue}>{state.currentRecord.plateNumber}</Text>
           </View>
-          <View className={styles.infoRow}>
-            <Text className={styles.infoLabel}>原司机</Text>
-            <Text className={styles.infoValue}>
-              {state.currentRecord.originalDriverName || state.currentRecord.driverName}
-            </Text>
-          </View>
-          {isRelief && state.currentRecord.inspectorName && (
-            <View className={styles.infoRow}>
-              <Text className={styles.infoLabel}>代检人</Text>
-              <View className={styles.reliefTag}>
-                <Text className={styles.reliefTagText}>🔄 {state.currentRecord.inspectorName}</Text>
+          {isRelief && state.currentRecord.inspectorName && state.currentRecord.originalDriverName ? (
+            <>
+              <View className={styles.infoRow}>
+                <Text className={styles.infoLabel}>司机信息</Text>
+                <View className={styles.relDriverDisplay}>
+                  <View className={styles.relDriverBox}>
+                    <Text className={styles.relDriverLabel}>原司机</Text>
+                    <Text className={styles.relDriverName}>{state.currentRecord.originalDriverName}</Text>
+                  </View>
+                  <Text className={styles.relDriverArrow}>→</Text>
+                  <View className={classnames(styles.relDriverBox, styles.relDriverBoxActive)}>
+                    <Text className={styles.relDriverLabel}>代检人</Text>
+                    <Text className={styles.relDriverName}>{state.currentRecord.inspectorName}</Text>
+                  </View>
+                </View>
               </View>
+            </>
+          ) : (
+            <View className={styles.infoRow}>
+              <Text className={styles.infoLabel}>司机</Text>
+              <Text className={styles.infoValue}>
+                {state.currentRecord.driverName}
+              </Text>
             </View>
           )}
           <View className={styles.infoRow}>
@@ -151,6 +162,38 @@ const InspectionResultPage: React.FC = () => {
               {dayjs(state.currentRecord.completedAt || Date.now()).format('YYYY-MM-DD HH:mm:ss')}
             </Text>
           </View>
+
+          {state.currentRecord.matchingVerified && (
+            <View className={styles.matchingTraceCard}>
+              <Text className={styles.matchingTraceTitle}>📦 温区匹配验证追溯</Text>
+              <View className={styles.matchingTraceRow}>
+                <Text className={styles.matchingTraceLabel}>运单号</Text>
+                <Text className={styles.matchingTraceValue}>{state.currentRecord.matchingWaybillNo || state.currentRecord.waybillNo}</Text>
+              </View>
+              {state.currentRecord.goodsName && (
+                <View className={styles.matchingTraceRow}>
+                  <Text className={styles.matchingTraceLabel}>货品名称</Text>
+                  <Text className={styles.matchingTraceValue}>{state.currentRecord.goodsName}</Text>
+                </View>
+              )}
+              {state.currentRecord.targetTemp && (
+                <View className={styles.matchingTraceRow}>
+                  <Text className={styles.matchingTraceLabel}>目标温度</Text>
+                  <Text className={styles.matchingTraceValue}>{state.currentRecord.targetTemp}</Text>
+                </View>
+              )}
+              {state.currentRecord.matchingTemp !== undefined && (
+                <View className={styles.matchingTraceRow}>
+                  <Text className={styles.matchingTraceLabel}>验证温度</Text>
+                  <Text className={styles.matchingTraceValue}>{state.currentRecord.matchingTemp}℃</Text>
+                </View>
+              )}
+              <View className={styles.matchingTraceRow}>
+                <Text className={styles.matchingTraceLabel}>验证结果</Text>
+                <Text className={classnames(styles.matchingTraceValue, styles.matchingSuccess)}>✅ 验证通过</Text>
+              </View>
+            </View>
+          )}
 
           <View className={classnames(styles.tempMatchCard, !isTempMatch && styles.tempMismatchCard)}>
             <Text className={styles.tempMatchText}>

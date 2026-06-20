@@ -14,6 +14,8 @@ interface InspectionState {
   matchingWaybillNo: string | null;
   matchingTempZone: TempZoneType | null;
   matchingVerified: boolean;
+  matchingGoodsName: string | null;
+  matchingTargetTemp: string | null;
 }
 
 type InspectionAction =
@@ -22,7 +24,7 @@ type InspectionAction =
   | { type: 'SET_INSPECTOR'; payload: string | null }
   | { type: 'SET_RELIEF_MODE'; payload: boolean }
   | { type: 'SET_FROM_MATCHING'; payload: boolean }
-  | { type: 'SET_MATCHING_DATA'; payload: { temp: number; waybillNo: string; tempZone: TempZoneType; verified: boolean } }
+  | { type: 'SET_MATCHING_DATA'; payload: { temp: number; waybillNo: string; tempZone: TempZoneType; verified: boolean; goodsName?: string; targetTemp?: string } }
   | { type: 'UPDATE_ITEM'; payload: { key: InspectionItemKey; status: CheckStatus; photo?: string; remark?: string } }
   | { type: 'COMPLETE_INSPECTION' }
   | { type: 'RESET' }
@@ -38,7 +40,9 @@ const initialState: InspectionState = {
   matchingWaybillTemp: 0,
   matchingWaybillNo: null,
   matchingTempZone: null,
-  matchingVerified: false
+  matchingVerified: false,
+  matchingGoodsName: null,
+  matchingTargetTemp: null
 };
 
 const createEmptyRecord = (task: Task, inspectorName?: string | null, isRelief?: boolean): InspectionRecord => {
@@ -75,6 +79,13 @@ const inspectionReducer = (state: InspectionState, action: InspectionAction): In
       record.currentTemp = tempToUse;
       if (tempToUse !== 0) {
         record.isTempMatch = checkTempMatch(tempToUse, action.payload.tempZone);
+      }
+      if (state.fromMatching) {
+        record.matchingWaybillNo = state.matchingWaybillNo || undefined;
+        record.matchingTemp = state.matchingWaybillTemp || undefined;
+        record.matchingVerified = state.matchingVerified || undefined;
+        record.goodsName = state.matchingGoodsName || undefined;
+        record.targetTemp = state.matchingTargetTemp || undefined;
       }
       storage.setCurrentTask(action.payload.id);
       return {
@@ -126,6 +137,8 @@ const inspectionReducer = (state: InspectionState, action: InspectionAction): In
         matchingWaybillNo: action.payload.waybillNo,
         matchingTempZone: action.payload.tempZone,
         matchingVerified: action.payload.verified,
+        matchingGoodsName: action.payload.goodsName || null,
+        matchingTargetTemp: action.payload.targetTemp || null,
         currentTemp: action.payload.temp
       };
     }
@@ -215,7 +228,7 @@ interface InspectionContextType {
   setTemperature: (temp: number) => void;
   setInspector: (name: string | null) => void;
   setReliefMode: (enabled: boolean) => void;
-  setMatchingData: (data: { temp: number; waybillNo: string; tempZone: TempZoneType; verified: boolean }) => void;
+  setMatchingData: (data: { temp: number; waybillNo: string; tempZone: TempZoneType; verified: boolean; goodsName?: string; targetTemp?: string }) => void;
   completeInspection: () => void;
   resetInspection: () => void;
   canSubmit: () => boolean;
@@ -253,7 +266,7 @@ export const InspectionProvider: React.FC<{ children: ReactNode }> = ({ children
     console.log('[InspectionContext] Set relief mode:', enabled);
   };
 
-  const setMatchingData = (data: { temp: number; waybillNo: string; tempZone: TempZoneType; verified: boolean }) => {
+  const setMatchingData = (data: { temp: number; waybillNo: string; tempZone: TempZoneType; verified: boolean; goodsName?: string; targetTemp?: string }) => {
     dispatch({ type: 'SET_MATCHING_DATA', payload: data });
     console.log('[InspectionContext] Set matching data:', data);
   };

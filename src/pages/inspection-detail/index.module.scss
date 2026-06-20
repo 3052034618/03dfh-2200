@@ -384,15 +384,38 @@
 
 .matchVerifiedCard {
   margin-top: $spacing-md;
-  background: rgba(0, 200, 83, 0.1);
+  background: rgba(0, 200, 83, 0.08);
   border: 2rpx solid rgba(0, 200, 83, 0.3);
-  border-radius: $radius-sm;
-  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-md;
+  padding: $spacing-md;
 }
 
-.matchVerifiedText {
+.matchVerifiedTitle {
   font-size: $font-size-sm;
   color: $color-success;
+  font-weight: $font-weight-semibold;
+  margin-bottom: $spacing-sm;
+}
+
+.matchInfoRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-xs;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.matchInfoLabel {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.matchInfoValue {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
   font-weight: $font-weight-medium;
 }
 

@@ -113,7 +113,9 @@ const MatchingPage: React.FC = () => {
       temp: temp,
       waybillNo: waybillInfo.waybillNo,
       tempZone: waybillInfo.tempZone,
-      verified: true
+      verified: true,
+      goodsName: waybillInfo.goodsName,
+      targetTemp: waybillInfo.targetTemp
     });
 
     if (matchedTask) {

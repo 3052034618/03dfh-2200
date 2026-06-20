@@ -305,7 +305,27 @@ const InspectionDetailPage: React.FC = () => {
             </View>
             {state.fromMatching && state.matchingVerified && (
               <View className={styles.matchVerifiedCard}>
-                <Text className={styles.matchVerifiedText}>✅ 温区已通过匹配验证（运单：{state.matchingWaybillNo}）</Text>
+                <Text className={styles.matchVerifiedTitle}>✅ 温区已通过匹配验证</Text>
+                {state.matchingGoodsName && (
+                  <View className={styles.matchInfoRow}>
+                    <Text className={styles.matchInfoLabel}>货品</Text>
+                    <Text className={styles.matchInfoValue}>{state.matchingGoodsName}</Text>
+                  </View>
+                )}
+                {state.matchingTargetTemp && (
+                  <View className={styles.matchInfoRow}>
+                    <Text className={styles.matchInfoLabel}>目标温度</Text>
+                    <Text className={styles.matchInfoValue}>{state.matchingTargetTemp}</Text>
+                  </View>
+                )}
+                <View className={styles.matchInfoRow}>
+                  <Text className={styles.matchInfoLabel}>当前温度</Text>
+                  <Text className={styles.matchInfoValue}>{state.matchingWaybillTemp}℃</Text>
+                </View>
+                <View className={styles.matchInfoRow}>
+                  <Text className={styles.matchInfoLabel}>运单号</Text>
+                  <Text className={styles.matchInfoValue}>{state.matchingWaybillNo}</Text>
+                </View>
               </View>
             )}
           </View>
@@ -415,7 +435,7 @@ const InspectionDetailPage: React.FC = () => {
             onClick={() => handleStatusSelect('passed')}
             disabled={isSubmitting || (tempBlocked && !state.matchingVerified && itemKey === 'precooling')}
           >
-            {isLastItem ? '完成检查' : '通过'}
+            通过
           </Button>
         </View>
       </View>

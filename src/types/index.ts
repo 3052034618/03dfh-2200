@@ -48,6 +48,11 @@ export interface InspectionRecord {
   isTempMatch: boolean;
   completedAt?: number;
   createdAt: number;
+  matchingWaybillNo?: string;
+  matchingTemp?: number;
+  matchingVerified?: boolean;
+  goodsName?: string;
+  targetTemp?: string;
 }
 
 export interface WaybillInfo {
@@ -76,6 +81,11 @@ export interface DriverInspectionStatus {
   tempZone?: TempZoneType;
   currentTemp?: number;
   waybillNo?: string;
+  goodsName?: string;
+  targetTemp?: string;
+  reviewNote?: string;
+  reviewedAt?: number;
+  reviewedBy?: string;
 }
 
 export interface TempZoneConfig {
